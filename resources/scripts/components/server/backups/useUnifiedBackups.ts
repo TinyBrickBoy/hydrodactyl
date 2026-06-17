@@ -3,7 +3,7 @@ import { getGlobalDaemonType } from '@/api/server/getServer';
 import getServerBackups from '@/api/swr/getServerBackups';
 import { ServerContext } from '@/state/server';
 import { LiveProgressContext } from './BackupContainer';
-import type { UnifiedBackup } from './BackupItem';
+import type { UnifiedBackup } from './elytra/BackupItem';
 
 export const useUnifiedBackups = () => {
     const { data: backups, error, isValidating, mutate } = getServerBackups();

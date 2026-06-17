@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl';
-import ActionButton from '@/components/elements/ActionButton';
+import { Button } from '@/components/ui/button';
 import { ModalMask } from '@/components/elements/Modal';
 import FadeTransition from '@/components/elements/transitions/FadeTransition';
 import useEventListener from '@/plugins/useEventListener';
@@ -163,12 +163,12 @@ const UploadButton = () => {
                 }}
                 multiple
             />
-            <ActionButton
+            <Button
                 variant='secondary'
                 onClick={() => fileUploadInput.current && fileUploadInput.current.click()}
             >
                 Upload
-            </ActionButton>
+            </Button>
         </>
     );
 };

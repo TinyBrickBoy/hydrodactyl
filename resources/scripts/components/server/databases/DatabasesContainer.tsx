@@ -1,3 +1,4 @@
+import { Plus } from '@gravity-ui/icons';
 import { Database } from '@gravity-ui/icons';
 import { Form, Formik, type FormikHelpers } from 'formik';
 import { For } from 'million/react';
@@ -6,7 +7,7 @@ import { object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
 import createServerDatabase from '@/api/server/databases/createServerDatabase';
 import getServerDatabases from '@/api/server/databases/getServerDatabases';
-import ActionButton from '@/components/elements/ActionButton';
+import { Button } from '@/components/ui/button';
 import Can from '@/components/elements/Can';
 import Field from '@/components/elements/Field';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
@@ -81,30 +82,32 @@ const DatabasesContainer = () => {
     }, []);
 
     return (
-        <ServerContentBlock title={'Databases'} showFlashKey={'databases'}>
+        <ServerContentBlock className='p-0!' title={'Databases'} showFlashKey={'databases'}>
             <ServerHeader />
-            <Can action={'database.create'}>
-                <div className='flex flex-col sm:flex-row items-center justify-end gap-4'>
-                    {databaseLimit === null && (
-                        <p className='text-sm text-zinc-300 text-center sm:text-right'>
-                            {databases.length} databases (unlimited)
-                        </p>
-                    )}
-                    {databaseLimit > 0 && (
-                        <p className='text-sm text-zinc-300 text-center sm:text-right'>
-                            {databases.length} of {databaseLimit} databases
-                        </p>
-                    )}
-                    {databaseLimit === 0 && (
-                        <p className='text-sm text-red-400 text-center sm:text-right'>Databases disabled</p>
-                    )}
-                    {(databaseLimit === null || (databaseLimit > 0 && databaseLimit !== databases.length)) && (
-                        <ActionButton variant='secondary' onClick={() => setCreateModalVisible(true)}>
+            <div className='px-2 pt-2 sm:px-14 sm:pt-14 flex flex-col sm:flex-row items-center gap-4'>
+                {(databaseLimit === null || (databaseLimit > 0 && databaseLimit !== databases.length)) && (
+                    <Can action={'database.create'}>
+                        <Button variant='secondary' onClick={() => setCreateModalVisible(true)} className='flex items-center gap-2'
+                        >
+                            <Plus width={22} height={22} fill='currentColor' />
                             New Database
-                        </ActionButton>
-                    )}
-                </div>
-            </Can>
+                        </Button>
+                    </Can>
+                )}
+                {databaseLimit === null && (
+                    <p className='text-sm text-zinc-300 text-center sm:text-right'>
+                        {databases.length} databases (unlimited)
+                    </p>
+                )}
+                {databaseLimit > 0 && (
+                    <p className='text-sm text-zinc-300 text-center sm:text-right'>
+                        {databases.length} of {databaseLimit} databases
+                    </p>
+                )}
+                {databaseLimit === 0 && (
+                    <p className='text-sm text-red-400 text-center sm:text-right'>Databases disabled</p>
+                )}
+            </div>
             <Formik
                 onSubmit={submitDatabase}
                 initialValues={{ databaseName: '', connectionsFrom: '' }}
@@ -143,9 +146,9 @@ const DatabasesContainer = () => {
                                     />
                                 </div>
                                 <div className={`flex gap-3 justify-end my-6`}>
-                                    <ActionButton variant='primary' type={'submit'}>
+                                    <Button variant='attention' type={'submit'}>
                                         Create Database
-                                    </ActionButton>
+                                    </Button>
                                 </div>
                             </Form>
                         </div>

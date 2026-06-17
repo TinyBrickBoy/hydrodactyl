@@ -5,7 +5,6 @@ import {
     Pencil,
     Shield,
     TrashBin,
-    TriangleExclamation,
 } from '@gravity-ui/icons';
 import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
@@ -23,13 +22,12 @@ import {
     DropdownMenuTrigger,
 } from '@/components/elements/DropdownMenu';
 import { Dialog } from '@/components/elements/dialog';
-import Spinner from '@/components/elements/Spinner';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
-import FlashMessageRender from '@/components/FlashMessageRender';
 import useFlash from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 import { useUnifiedBackups } from '../useUnifiedBackups';
+import ConfirmPasswordModal from '../components/ConfirmPasswordModal';
 
 interface Props {
     backup: ServerBackup;
@@ -43,12 +41,8 @@ const BackupContextMenu = ({ backup }: Props) => {
     const [loading, setLoading] = useState(false);
     const [countdown, setCountdown] = useState(5);
     const [newName, setNewName] = useState(backup.name);
-    const [deletePassword, setDeletePassword] = useState('');
-    const [deleteTotpCode, setDeleteTotpCode] = useState('');
-    const [restorePassword, setRestorePassword] = useState('');
-    const [restoreTotpCode, setRestoreTotpCode] = useState('');
-    const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
-    const { deleteBackup, restoreBackup, renameBackup, toggleBackupLock, refresh } = useUnifiedBackups();
+    const { clearFlashes, clearAndAddHttpError } = useFlash();
+    const { renameBackup, toggleBackupLock, refresh } = useUnifiedBackups();
     const hasTwoFactor = useStoreState((state: ApplicationStore) => state.user.data?.useTotp || false);
 
     const doDownload = () => {
@@ -65,42 +59,20 @@ const BackupContextMenu = ({ backup }: Props) => {
             .then(() => setLoading(false));
     };
 
-    const doDeletion = async () => {
-        if (!deletePassword) {
-            addFlash({
-                key: 'backup:delete',
-                type: 'error',
-                message: 'Password is required to delete this backup.',
-            });
-            return;
-        }
-
-        if (hasTwoFactor && !deleteTotpCode) {
-            addFlash({
-                key: 'backup:delete',
-                type: 'error',
-                message: 'Two-factor authentication code is required.',
-            });
-            return;
-        }
-
+    const doDeletion = async (password: string, totpCode?: string) => {
         setLoading(true);
         clearFlashes('backup:delete');
 
         try {
             await http.delete(`/api/client/servers/${daemonType}/${uuid}/backups/${backup.uuid}`, {
                 data: {
-                    password: deletePassword,
-                    ...(hasTwoFactor ? { totp_code: deleteTotpCode } : {}),
+                    password,
+                    ...(hasTwoFactor && totpCode ? { totp_code: totpCode } : {}),
                 },
             });
 
             setLoading(false);
             setModal('');
-            setDeletePassword('');
-            setDeleteTotpCode('');
-
-            // Refresh the backup list to reflect the deletion
             await refresh();
         } catch (error) {
             clearAndAddHttpError({ key: 'backup:delete', error });
@@ -108,35 +80,16 @@ const BackupContextMenu = ({ backup }: Props) => {
         }
     };
 
-    const doRestorationAction = async () => {
-        if (!restorePassword) {
-            addFlash({
-                key: 'backup:restore',
-                type: 'error',
-                message: 'Password is required to restore this backup.',
-            });
-            return;
-        }
-
-        if (hasTwoFactor && !restoreTotpCode) {
-            addFlash({
-                key: 'backup:restore',
-                type: 'error',
-                message: 'Two-factor authentication code is required.',
-            });
-            return;
-        }
-
+    const doRestorationAction = async (password: string, totpCode?: string) => {
         setLoading(true);
         clearFlashes('backup:restore');
 
         try {
             await http.post(`/api/client/servers/${daemonType}/${uuid}/backups/${backup.uuid}/restore`, {
-                password: restorePassword,
-                ...(hasTwoFactor ? { totp_code: restoreTotpCode } : {}),
+                password,
+                ...(hasTwoFactor && totpCode ? { totp_code: totpCode } : {}),
             });
 
-            // Set server status to restoring
             setServerFromState((s) => ({
                 ...s,
                 status: 'restoring_backup',
@@ -144,8 +97,6 @@ const BackupContextMenu = ({ backup }: Props) => {
 
             setLoading(false);
             setModal('');
-            setRestorePassword('');
-            setRestoreTotpCode('');
         } catch (error) {
             clearAndAddHttpError({ key: 'backup:restore', error });
             setLoading(false);
@@ -206,6 +157,7 @@ const BackupContextMenu = ({ backup }: Props) => {
 
     return (
         <>
+            {/* Rename Dialog */}
             <Dialog open={modal === 'rename'} onClose={() => setModal('')} title='Rename Backup'>
                 <div className='space-y-4'>
                     <div>
@@ -234,6 +186,8 @@ const BackupContextMenu = ({ backup }: Props) => {
                     </ActionButton>
                 </Dialog.Footer>
             </Dialog>
+
+            {/* Unlock Confirmation */}
             <Dialog.Confirm
                 open={modal === 'unlock'}
                 onClose={() => setModal('')}
@@ -242,200 +196,36 @@ const BackupContextMenu = ({ backup }: Props) => {
             >
                 This backup will no longer be protected from automated or accidental deletions.
             </Dialog.Confirm>
-            <Dialog
+
+            {/* Restore Modal */}
+            <ConfirmPasswordModal
                 open={modal === 'restore'}
-                onClose={() => {
-                    setModal('');
-                    setRestorePassword('');
-                    setRestoreTotpCode('');
-                }}
+                onClose={() => setModal('')}
+                onConfirmed={doRestorationAction}
                 title='Restore Backup'
-            >
-                <FlashMessageRender byKey={'backup:restore'} />
-                <div className='space-y-4'>
-                    <div className='space-y-2'>
-                        <p className='text-sm font-medium text-zinc-200'>&quot;{backup.name}&quot;</p>
-                        <p className='text-sm text-zinc-400'>
-                            Your server will be stopped during the restoration process. You will not be able to control
-                            the power state, access the file manager, or create additional backups until completed.
-                        </p>
-                    </div>
+                flashKey='backup:restore'
+                loading={loading}
+                description={`"${backup.name}" - Your server will be stopped during the restoration process. You will not be able to control the power state, access the file manager, or create additional backups until completed.`}
+                warningItems={[
+                    'All current files and server configuration will be deleted and replaced with the backup data.',
+                    'This action cannot be undone.',
+                ]}
+                confirmText={countdown > 0 ? `Delete All & Restore (${countdown}s)` : 'Delete All & Restore Backup'}
+            />
 
-                    <div className='p-4 bg-red-500/10 border border-red-500/20 rounded-lg'>
-                        <div className='flex items-start space-x-3'>
-                            <TriangleExclamation
-                                width={22}
-                                height={22}
-                                fill='currentColor'
-                                className=' text-red-400 flex-shrink-0 mt-0.5'
-                            />
-                            <div className='space-y-1'>
-                                <h4 className='text-sm text-red-200 font-medium'>
-                                    Destructive Action - Complete Server Restore
-                                </h4>
-                                <p className='text-xs text-red-300'>
-                                    All current files and server configuration will be deleted and replaced with the
-                                    backup data. This action cannot be undone.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='space-y-3'>
-                        <div>
-                            <label htmlFor='restore-password' className='block text-sm font-medium text-zinc-300 mb-1'>
-                                Password
-                            </label>
-                            <input
-                                id='restore-password'
-                                type='password'
-                                className='w-full px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-sm border border-zinc-700 focus:border-brand'
-                                placeholder='Enter your password'
-                                value={restorePassword}
-                                onChange={(e) => setRestorePassword(e.target.value)}
-                                disabled={loading}
-                            />
-                        </div>
-
-                        {hasTwoFactor && (
-                            <div>
-                                <label htmlFor='restore-totp' className='block text-sm font-medium text-zinc-300 mb-1'>
-                                    Two-Factor Authentication Code
-                                </label>
-                                <input
-                                    id='restore-totp'
-                                    type='text'
-                                    className='w-full px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-sm border border-zinc-700 focus:border-brand'
-                                    placeholder='6-digit code'
-                                    maxLength={6}
-                                    value={restoreTotpCode}
-                                    onChange={(e) => setRestoreTotpCode(e.target.value.replace(/[^0-9]/g, ''))}
-                                    disabled={loading}
-                                />
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <Dialog.Footer>
-                    <ActionButton
-                        onClick={() => {
-                            setModal('');
-                            setRestorePassword('');
-                            setRestoreTotpCode('');
-                        }}
-                        variant='secondary'
-                        disabled={loading}
-                    >
-                        Cancel
-                    </ActionButton>
-                    <ActionButton
-                        onClick={() => doRestorationAction()}
-                        variant='danger'
-                        disabled={countdown > 0 || loading}
-                    >
-                        {loading && <Spinner size='small' />}
-                        {loading
-                            ? 'Restoring...'
-                            : countdown > 0
-                              ? `Delete All & Restore (${countdown}s)`
-                              : 'Delete All & Restore Backup'}
-                    </ActionButton>
-                </Dialog.Footer>
-            </Dialog>
-            <Dialog
+            {/* Delete Modal */}
+            <ConfirmPasswordModal
                 open={modal === 'delete'}
-                onClose={() => {
-                    setModal('');
-                    setDeletePassword('');
-                    setDeleteTotpCode('');
-                }}
+                onClose={() => setModal('')}
+                onConfirmed={doDeletion}
                 title={`Delete "${backup.name}"`}
-            >
-                <FlashMessageRender byKey={'backup:delete'} />
-                <div className='space-y-4'>
-                    <p className='text-sm text-zinc-300'>
-                        This is a permanent operation. The backup cannot be recovered once deleted.
-                    </p>
+                flashKey='backup:delete'
+                loading={loading}
+                description='This is a permanent operation. The backup cannot be recovered once deleted.'
+                warningItems={['The backup file and its snapshot will be permanently deleted.']}
+                confirmText='Delete Backup'
+            />
 
-                    <div className='p-4 bg-red-500/10 border border-red-500/20 rounded-lg'>
-                        <div className='flex items-start gap-3'>
-                            <svg
-                                className='w-5 h-5 text-red-400 mt-0.5 flex-shrink-0'
-                                fill='none'
-                                viewBox='0 0 24 24'
-                                stroke='currentColor'
-                            >
-                                <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth={2}
-                                    d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-                                />
-                            </svg>
-                            <div className='text-sm'>
-                                <p className='font-medium text-red-300'>Warning</p>
-                                <p className='text-red-400 mt-1'>
-                                    The backup file and its snapshot will be permanently deleted.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='space-y-3'>
-                        <div>
-                            <label htmlFor='delete-password' className='block text-sm font-medium text-zinc-300 mb-1'>
-                                Password
-                            </label>
-                            <input
-                                id='delete-password'
-                                type='password'
-                                className='w-full px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-sm border border-zinc-700 focus:border-brand'
-                                placeholder='Enter your password'
-                                value={deletePassword}
-                                onChange={(e) => setDeletePassword(e.target.value)}
-                                disabled={loading}
-                            />
-                        </div>
-
-                        {hasTwoFactor && (
-                            <div>
-                                <label htmlFor='delete-totp' className='block text-sm font-medium text-zinc-300 mb-1'>
-                                    Two-Factor Authentication Code
-                                </label>
-                                <input
-                                    id='delete-totp'
-                                    type='text'
-                                    className='w-full px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-sm border border-zinc-700 focus:border-brand'
-                                    placeholder='6-digit code'
-                                    maxLength={6}
-                                    value={deleteTotpCode}
-                                    onChange={(e) => setDeleteTotpCode(e.target.value.replace(/[^0-9]/g, ''))}
-                                    disabled={loading}
-                                />
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <Dialog.Footer>
-                    <ActionButton
-                        variant='secondary'
-                        onClick={() => {
-                            setModal('');
-                            setDeletePassword('');
-                            setDeleteTotpCode('');
-                        }}
-                        disabled={loading}
-                    >
-                        Cancel
-                    </ActionButton>
-                    <ActionButton variant='danger' onClick={doDeletion} disabled={loading}>
-                        {loading && <Spinner size='small' />}
-                        {loading ? 'Deleting...' : 'Delete Backup'}
-                    </ActionButton>
-                </Dialog.Footer>
-            </Dialog>
             <SpinnerOverlay visible={loading} fixed />
             {backup.isSuccessful ? (
                 <DropdownMenu>

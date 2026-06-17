@@ -3,7 +3,7 @@ import { join } from 'pathe';
 import { useContext, useEffect, useState } from 'react';
 import { object, string } from 'yup';
 import createDirectory from '@/api/server/files/createDirectory';
-import ActionButton from '@/components/elements/ActionButton';
+import { Button } from '@/components/ui/button';
 import Code from '@/components/elements/Code';
 import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
 import Field from '@/components/elements/Field';
@@ -84,12 +84,12 @@ const NewDirectoryDialog = asDialog({
                         </p>
                     </Form>
                     <Dialog.Footer>
-                        <ActionButton variant='secondary' className={'w-full sm:w-auto'} onClick={close}>
+                        <Button variant='secondary' className={'w-full sm:w-auto'} onClick={close}>
                             Cancel
-                        </ActionButton>
-                        <ActionButton variant='primary' className={'w-full sm:w-auto'} onClick={submitForm}>
+                        </Button>
+                        <Button variant='attention' className={'w-full sm:w-auto'} onClick={submitForm}>
                             Create
-                        </ActionButton>
+                        </Button>
                     </Dialog.Footer>
                 </>
             )}
@@ -103,13 +103,13 @@ const NewDirectoryButton = () => {
     return (
         <>
             <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} />
-            <ActionButton
+            <Button
                 variant='secondary'
                 onClick={setOpen.bind(this, true)}
                 className='border-r-cream-600 rounded-r-none'
             >
                 New Folder
-            </ActionButton>
+            </Button>
         </>
     );
 };
