@@ -1,6 +1,6 @@
 import { useStoreState } from 'easy-peasy';
 import isEqual from 'react-fast-compare';
-import ActionButton from '@/components/elements/ActionButton';
+import { Button } from '@/components/ui/button';
 import Can from '@/components/elements/Can';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import Label from '@/components/elements/Label';
@@ -82,7 +82,7 @@ const SettingsContainer = () => {
                             </div>
                             <div className={`ml-4`}>
                                 <a href={`sftp://${username}.${id}@${ip(sftp.ip)}:${sftp.port}`}>
-                                    <ActionButton variant='secondary'>Launch SFTP</ActionButton>
+                                    <Button variant='secondary'>Launch SFTP</Button>
                                 </a>
                             </div>
                         </div>
