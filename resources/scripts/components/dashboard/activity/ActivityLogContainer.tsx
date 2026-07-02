@@ -1,17 +1,15 @@
 import { ArrowDownToLine, ArrowRotateLeft, Funnel, Magnifier, Xmark } from '@gravity-ui/icons';
 import { useEffect, useMemo, useState } from 'react';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import { type ActivityLogFilters, useActivityLogs } from '@/api/account/activity';
+import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
+import { Input } from '@/components/elements/inputs';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Select from '@/components/elements/Select';
 import Spinner from '@/components/elements/Spinner';
-import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
-import { Input } from '@/components/elements/inputs';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
-
-import { ActivityLogFilters, useActivityLogs } from '@/api/account/activity';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import { Button } from '@/components/ui/button';
 
 import { useFlashKey } from '@/plugins/useFlash';
 import useLocationHash from '@/plugins/useLocationHash';
@@ -19,7 +17,10 @@ import useLocationHash from '@/plugins/useLocationHash';
 const ActivityLogContainer = () => {
     const { hash } = useLocationHash();
     const { clearAndAddHttpError } = useFlashKey('account');
-    const [filters, setFilters] = useState<ActivityLogFilters>({ page: 1, sorts: { timestamp: -1 } });
+    const [filters, setFilters] = useState<ActivityLogFilters>({
+        page: 1,
+        sorts: { timestamp: -1 },
+    });
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedEventType, setSelectedEventType] = useState('');
     const [showFilters, setShowFilters] = useState(false);
@@ -148,7 +149,10 @@ const ActivityLogContainer = () => {
     }, [showFilters, autoRefresh]);
 
     useEffect(() => {
-        setFilters((value) => ({ ...value, filters: { ip: hash.ip, event: hash.event } }));
+        setFilters((value) => ({
+            ...value,
+            filters: { ip: hash.ip, event: hash.event },
+        }));
     }, [hash]);
 
     useEffect(() => {
@@ -170,7 +174,7 @@ const ActivityLogContainer = () => {
                 >
                     <MainPageHeader title={'Activity Log'}>
                         <div className='flex gap-2 items-center flex-wrap'>
-                            <ActionButton
+                            <Button
                                 variant='secondary'
                                 onClick={() => setShowFilters(!showFilters)}
                                 className='flex items-center gap-2'
@@ -179,9 +183,9 @@ const ActivityLogContainer = () => {
                                 <Funnel width={22} height={22} fill='currentColor' />
                                 Filters
                                 {hasActiveFilters && <span className='w-2 h-2 bg-blue-500 rounded-full'></span>}
-                            </ActionButton>
-                            <ActionButton
-                                variant={autoRefresh ? 'primary' : 'secondary'}
+                            </Button>
+                            <Button
+                                variant={autoRefresh ? 'default' : 'secondary'}
                                 onClick={() => setAutoRefresh(!autoRefresh)}
                                 className='flex items-center gap-2'
                                 title='Auto Refresh (Ctrl+R)'
@@ -192,8 +196,8 @@ const ActivityLogContainer = () => {
                                     <Magnifier width={22} height={22} fill='currentColor' />
                                 )}
                                 {autoRefresh ? 'Live' : 'Refresh'}
-                            </ActionButton>
-                            <ActionButton
+                            </Button>
+                            <Button
                                 variant='secondary'
                                 onClick={exportLogs}
                                 disabled={!filteredData?.items?.length}
@@ -202,7 +206,7 @@ const ActivityLogContainer = () => {
                             >
                                 <ArrowDownToLine width={22} height={22} fill='currentColor' />
                                 Export
-                            </ActionButton>
+                            </Button>
                         </div>
                     </MainPageHeader>
                 </div>
@@ -293,14 +297,14 @@ const ActivityLogContainer = () => {
 
                                 <div className='flex items-end'>
                                     {hasActiveFilters && (
-                                        <ActionButton
+                                        <Button
                                             variant='secondary'
                                             onClick={clearAllFilters}
                                             className='flex items-center gap-2 w-full'
                                         >
                                             <Xmark width={22} height={22} fill='currentColor' />
                                             Clear All Filters
-                                        </ActionButton>
+                                        </Button>
                                     )}
                                 </div>
                             </div>
@@ -349,12 +353,12 @@ const ActivityLogContainer = () => {
                                 </p>
                                 {hasActiveFilters && (
                                     <div className='flex gap-2 justify-center'>
-                                        <ActionButton variant='secondary' onClick={clearAllFilters}>
+                                        <Button variant='secondary' onClick={clearAllFilters}>
                                             Clear All Filters
-                                        </ActionButton>
-                                        <ActionButton variant='secondary' onClick={() => setShowFilters(true)}>
+                                        </Button>
+                                        <Button variant='secondary' onClick={() => setShowFilters(true)}>
                                             Adjust Filters
-                                        </ActionButton>
+                                        </Button>
                                     </div>
                                 )}
                             </div>

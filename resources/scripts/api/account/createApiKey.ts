@@ -1,4 +1,4 @@
-import { ApiKey, rawDataToApiKey } from '@/api/account/getApiKeys';
+import { type ApiKey, rawDataToApiKey } from '@/api/account/getApiKeys';
 import http from '@/api/http';
 
 export default (description: string, allowedIps: string): Promise<ApiKey & { secretToken: string }> => {

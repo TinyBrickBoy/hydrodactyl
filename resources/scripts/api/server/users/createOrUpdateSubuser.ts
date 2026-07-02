@@ -2,7 +2,7 @@ import http from '@/api/http';
 import { getGlobalDaemonType } from '@/api/server/getServer';
 import { rawDataToServerSubuser } from '@/api/server/users/getServerSubusers';
 
-import { Subuser } from '@/state/server/subusers';
+import type { Subuser } from '@/state/server/subusers';
 
 interface Params {
     email: string;

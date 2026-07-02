@@ -1,69 +1,60 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-
+import getServerResourceUsage, { type ServerPowerState, type ServerStats } from '@/api/server/getServerResourceUsage';
 import { bytesToString, ip } from '@/lib/formatters';
-
-import { Server } from '@/api/server/getServer';
-import getServerResourceUsage, { ServerPowerState, ServerStats } from '@/api/server/getServerResourceUsage';
 
 // Determines if the current value is in an alarm threshold so we can show it in red rather
 // than the more faded default style.
 const isAlarmState = (current: number, limit: number): boolean => limit > 0 && current / (limit * 1024 * 1024) >= 0.9;
 
 const StatusIndicatorBox = styled.div<{ $status: ServerPowerState }>`
-    background: #ffffff11;
-    border: 1px solid #ffffff12;
-    transition: all 250ms ease-in-out;
-    padding: 1.75rem 2rem;
-    cursor: pointer;
-    border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
+transition: all 250ms ease-in-out;
+padding: 1.75rem 2rem;
+cursor: pointer;
+border-radius: 0.75rem;
+display: flex;
+align-items: center;
+justify-content: space-between;
+position: relative;
 
     &:hover {
-        border: 1px solid #ffffff19;
-        background: #ffffff19;
-        transition-duration: 0ms;
-    }
+    border: 1px solid #ffffff11;
+}
 
     & .status-bar {
-        width: 12px;
-        height: 12px;
-        min-width: 12px;
-        min-height: 12px;
-        background-color: #ffffff11;
-        z-index: 20;
-        border-radius: 9999px;
-        transition: all 250ms ease-in-out;
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    min-height: 12px;
+    background-color: #ffffff11;
+    z-index: 20;
+    border-radius: 9999px;
+    transition: all 250ms ease-in-out;
 
-        box-shadow: ${({ $status }) => {
-            console.log($status);
-            if (!$status || $status === 'offline') {
-                return '0 0 12px 1px #C74343';
-            } else if ($status === 'running') {
-                return '0 0 12px 1px #43C760';
-            } else if ($status === 'installing') {
-                return '0 0 12px 1px #4381c7'; // Blue color for installing
-            } else {
-                return '0 0 12px 1px #c7aa43'; // Default for other statuses
-            }
-        }};
+    box-shadow: ${({ $status }) => {
+        if (!$status || $status === 'offline') {
+            return '0 0 12px 1px #C74343';
+        } else if ($status === 'running') {
+            return '0 0 12px 1px #43C760';
+        } else if ($status === 'installing') {
+            return '0 0 12px 1px #4381c7';
+        } else {
+            return '0 0 12px 1px #c7aa43';
+        }
+    }};
 
-        background: ${({ $status }) => {
-            if (!$status || $status === 'offline') {
-                return 'linear-gradient(180deg, #C74343 0%, #C74343 100%)';
-            } else if ($status === 'running') {
-                return 'linear-gradient(180deg, #91FFA9 0%, #43C760 100%)';
-            } else if ($status === 'installing') {
-                return 'linear-gradient(180deg, #91c7ff 0%, #4381c7 100%)';
-            } else {
-                return 'linear-gradient(180deg, #c7aa43 0%, #c7aa43 100%)'; // Default for other statuses
-            }
-        }};
-    }
+    background: ${({ $status }) => {
+        if (!$status || $status === 'offline') {
+            return 'linear-gradient(180deg, #C74343 0%, #C74343 100%)';
+        } else if ($status === 'running') {
+            return 'linear-gradient(180deg, #91FFA9 0%, #43C760 100%)';
+        } else if ($status === 'installing') {
+            return 'linear-gradient(180deg, #91c7ff 0%, #4381c7 100%)';
+        } else {
+            return 'linear-gradient(180deg, #c7aa43 0%, #c7aa43 100%)';
+        }
+    }}
 `;
 
 type Timer = ReturnType<typeof setInterval>;
@@ -108,19 +99,22 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
         alarms.disk = server.limits.disk === 0 ? false : isAlarmState(stats.diskUsageInBytes, server.limits.disk);
     }
 
-    // const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : 'Unlimited';
-    // const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : 'Unlimited';
-    // const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : 'Unlimited';
-
     return (
-        <StatusIndicatorBox as={Link} to={`/server/${server.id}`} className={className} $status={stats?.status}>
-            <div className={`flex items-center`}>
+        <StatusIndicatorBox
+            as={Link}
+            to={`/server/${server.id}`}
+            className={`{className} bg-mocha-500 hover:bg-mocha-400 border border-[1px] border-mocha-400 hover:border-mocha-400`}
+            $status={stats?.status || 'offline'}
+        >
+            <div className={`flex items - center`}>
                 <div className='flex flex-col'>
                     <div className='flex items-center gap-2'>
-                        <p className={`text-xl tracking-tight font-bold break-words`}>{server.name}</p>{' '}
+                        <p className={`text - xl tracking - tight font - bold truncate max - w - [20vw]`}>
+                            {server.name}
+                        </p>{' '}
                         <div className={'status-bar'} />
                     </div>
-                    <p className={`text-sm text-[#ffffff66]`}>
+                    <p className={`text - sm text - [#ffffff66]`}>
                         {server.allocations
                             .filter((alloc) => alloc.isDefault)
                             .map((allocation) => (
@@ -132,22 +126,18 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                 </div>
             </div>
             <div
-                style={{
-                    background:
-                        'radial-gradient(124.75% 124.75% at 50.01% -10.55%, rgb(36, 36, 36) 0%, rgb(20, 20, 20) 100%)',
-                }}
-                className={`h-full hidden sm:flex items-center justify-center border-[1px] border-[#ffffff12] shadow-md rounded-lg w-fit whitespace-nowrap px-4 py-2 text-sm gap-4`}
+                className={`h-full hidden sm:flex items-center justify-center bg-mocha-500 border-[1px] border-[#ffffff11] shadow-xs rounded-md w-fit whitespace-nowrap px-4 py-2 text-sm gap-4`}
             >
                 {!stats || isSuspended || isInstalling ? (
                     isSuspended ? (
-                        <div className={`flex-1 text-center`}>
-                            <span className={`text-red-100 text-xs`}>
+                        <div className={`flex - 1 text - center`}>
+                            <span className={`text - red - 100 text - xs`}>
                                 {server.status === 'suspended' ? 'Suspended' : 'Connection Error'}
                             </span>
                         </div>
                     ) : server.isTransferring || server.status ? (
-                        <div className={`flex-1 text-center`}>
-                            <span className={`text-zinc-100 text-xs`}>
+                        <div className={`flex - 1 text - center`}>
+                            <span className={`text - zinc - 100 text - xs`}>
                                 {server.isTransferring
                                     ? 'Transferring'
                                     : server.status === 'installing'
@@ -163,25 +153,23 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                 ) : (
                     <Fragment>
                         <div className={`sm:flex hidden`}>
-                            <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-xs text-zinc-400 font-medium w-fit whitespace-nowrap'>CPU</p>
-                                <p className='text-xs font-bold w-fit whitespace-nowrap'>
-                                    {stats.cpuUsagePercent.toFixed(2)}%
-                                </p>
+                            <div className={`flex justify - center gap - 2 w - fit`}>
+                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>CPU:</p>
+                                <p className='font-bold w-fit whitespace-nowrap'>{stats.cpuUsagePercent.toFixed(2)}%</p>
                             </div>
                         </div>
                         <div className={`sm:flex hidden`}>
-                            <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-xs text-zinc-400 font-medium w-fit whitespace-nowrap'>RAM</p>
-                                <p className='text-xs font-bold w-fit whitespace-nowrap'>
+                            <div className={`flex justify - center gap - 2 w - fit`}>
+                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>RAM:</p>
+                                <p className='font-bold w-fit whitespace-nowrap'>
                                     {bytesToString(stats.memoryUsageInBytes, 0)}
                                 </p>
                             </div>
                         </div>
                         <div className={`sm:flex hidden`}>
-                            <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-xs text-zinc-400 font-medium w-fit whitespace-nowrap'>Storage</p>
-                                <p className='text-xs font-bold w-fit whitespace-nowrap'>
+                            <div className={`flex justify - center gap - 2 w - fit`}>
+                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>Storage:</p>
+                                <p className='font-bold w-fit whitespace-nowrap'>
                                     {bytesToString(stats.diskUsageInBytes, 0)}
                                 </p>
                             </div>

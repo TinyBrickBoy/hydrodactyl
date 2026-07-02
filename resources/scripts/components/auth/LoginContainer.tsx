@@ -1,77 +1,80 @@
-import { useStoreState } from 'easy-peasy';
 import type { FormikHelpers } from 'formik';
 import { Formik } from 'formik';
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { object, string } from 'yup';
-
-import LoginFormContainer from '@/components/auth/LoginFormContainer';
+import login from '@/api/auth/login';
+import LoginFormContainer, { TitleSection } from '@/components/auth/LoginFormContainer';
 import Button from '@/components/elements/Button';
 import Captcha, { getCaptchaResponse } from '@/components/elements/Captcha';
 import Field from '@/components/elements/Field';
-import Logo from '@/components/elements/HydroLogo';
 
 import CaptchaManager from '@/lib/captcha';
 
-import login from '@/api/auth/login';
-
 import useFlash from '@/plugins/useFlash';
+
+import SecondaryLink from '../ui/secondary-link';
 
 interface Values {
     user: string;
     password: string;
 }
 
+interface ErrorResponse {
+    response: string;
+    message: string;
+    detail: string;
+    code: string;
+}
+
 function LoginContainer() {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        clearFlashes();
-    }, []);
-
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
-        clearFlashes();
+        // clearFlashes();
 
-        // Get captcha response if enabled
-        let loginData: any = values;
+        let loginData: Values = values;
         if (CaptchaManager.isEnabled()) {
             const captchaResponse = getCaptchaResponse();
             const fieldName = CaptchaManager.getProviderInstance().getResponseFieldName();
 
-            console.log('Captcha enabled, response:', captchaResponse, 'fieldName:', fieldName);
-
             if (fieldName) {
                 if (captchaResponse) {
                     loginData = { ...values, [fieldName]: captchaResponse };
-                    console.log('Adding captcha to login data:', loginData);
                 } else {
-                    // Captcha is enabled but no response - show error
                     console.error('Captcha enabled but no response available');
-                    clearAndAddHttpError({ error: new Error('Please complete the captcha verification.') });
+                    clearAndAddHttpError({
+                        error: new Error('Please complete the captcha verification.'),
+                    });
                     setSubmitting(false);
                     return;
                 }
             }
         } else {
-            console.log('Captcha not enabled');
         }
 
         login(loginData)
             .then((response) => {
                 if (response.complete) {
+                    clearFlashes();
                     window.location.href = response.intended || '/';
                     return;
                 }
-                navigate('/auth/login/checkpoint', { state: { token: response.confirmationToken } });
+                navigate('/auth/login/checkpoint', {
+                    state: { token: response.confirmationToken },
+                });
             })
-            .catch((error: any) => {
+            .catch((error: ErrorResponse) => {
                 setSubmitting(false);
 
                 if (error.code === 'InvalidCredentials') {
-                    clearAndAddHttpError({ error: new Error('Invalid username or password. Please try again.') });
+                    clearAndAddHttpError({
+                        error: new Error('Invalid username or password. Please try again.'),
+                    });
                 } else if (error.code === 'DisplayException') {
-                    clearAndAddHttpError({ error: new Error(error.detail || error.message) });
+                    clearAndAddHttpError({
+                        error: new Error(error.detail || error.message),
+                    });
                 } else {
                     clearAndAddHttpError({ error });
                 }
@@ -88,14 +91,17 @@ function LoginContainer() {
             })}
         >
             {({ isSubmitting }) => (
-                <LoginFormContainer className={`w-full flex`}>
-                    <div className='flex h-12 mb-4 items-center w-full'>
-                        <Logo />
+                <LoginFormContainer className={`flex flex-col gap-6`}>
+                    <TitleSection title='Login' />
+                    <div className=''>
+                        <Field
+                            id='user'
+                            type={'text'}
+                            label={'Username or Email'}
+                            name={'user'}
+                            disabled={isSubmitting}
+                        />
                     </div>
-                    <div aria-hidden className='my-8 bg-[#ffffff33] min-h-[1px]'></div>
-                    <h2 className='text-xl font-extrabold mb-2'>Login</h2>
-
-                    <Field id='user' type={'text'} label={'Username or Email'} name={'user'} disabled={isSubmitting} />
 
                     <div className={`relative mt-6`}>
                         <Field
@@ -105,12 +111,6 @@ function LoginContainer() {
                             name={'password'}
                             disabled={isSubmitting}
                         />
-                        <Link
-                            to={'/auth/password'}
-                            className={`text-xs text-zinc-500 tracking-wide no-underline hover:text-zinc-600 absolute top-1 right-0`}
-                        >
-                            Forgot Password?
-                        </Link>
                     </div>
 
                     <Captcha
@@ -123,16 +123,17 @@ function LoginContainer() {
                         }}
                     />
 
-                    <div className={`mt-6`}>
+                    <div className='flex w-full justify-between items-center'>
                         <Button
-                            className={`relative mt-4 w-full rounded-full bg-brand border-0 ring-0 outline-hidden capitalize font-bold text-sm py-2 hover:cursor-pointer`}
+                            className={`bg-mocha-100 rounded-full p-2 px-4 text-black hover:cursor-pointer hover:bg-mocha-200 hover:scale-102 ease-in-out`}
                             type={'submit'}
                             size={'xlarge'}
                             isLoading={isSubmitting}
                             disabled={isSubmitting}
                         >
-                            Login
+                            Sign in
                         </Button>
+                        <SecondaryLink to='/auth/password'>Forgot your password?</SecondaryLink>
                     </div>
                 </LoginFormContainer>
             )}

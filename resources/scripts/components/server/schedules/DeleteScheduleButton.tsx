@@ -1,14 +1,12 @@
-import { Actions, useStoreActions } from 'easy-peasy';
+import { type Actions, useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
-
-import ActionButton from '@/components/elements/ActionButton';
-import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
-import { Dialog } from '@/components/elements/dialog';
-
 import { httpErrorToHuman } from '@/api/http';
 import deleteSchedule from '@/api/server/schedules/deleteSchedule';
+import { Dialog } from '@/components/elements/dialog';
+import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import { Button } from '@/components/ui/button';
 
-import { ApplicationStore } from '@/state';
+import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
 interface Props {
@@ -51,9 +49,9 @@ const DeleteScheduleButton = ({ scheduleId, onDeleted }: Props) => {
             >
                 All tasks will be removed and any running processes will be terminated.
             </Dialog.Confirm>
-            <ActionButton variant='danger' className={'flex-1 sm:flex-none'} onClick={() => setVisible(true)}>
+            <Button variant='destructive' className={'flex-1 sm:flex-none'} onClick={() => setVisible(true)}>
                 Delete
-            </ActionButton>
+            </Button>
         </>
     );
 };

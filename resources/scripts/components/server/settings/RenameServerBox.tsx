@@ -1,16 +1,14 @@
-import { Actions, useStoreActions } from 'easy-peasy';
+import { type Actions, useStoreActions } from 'easy-peasy';
 import { Form, Formik } from 'formik';
 import { toast } from 'sonner';
 import { object, string } from 'yup';
-
-import ActionButton from '@/components/elements/ActionButton';
-import Field from '@/components/elements/Field';
-import TitledGreyBox from '@/components/elements/TitledGreyBox';
-
 import { httpErrorToHuman } from '@/api/http';
 import renameServer from '@/api/server/renameServer';
+import Field from '@/components/elements/Field';
+import TitledGreyBox from '@/components/elements/TitledGreyBox';
+import { Button } from '@/components/ui/button';
 
-import { ApplicationStore } from '@/state';
+import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
 interface Values {
@@ -25,9 +23,9 @@ const RenameServerForm = () => {
                 <Field id={'name'} name={'name'} label={'Server Name'} type={'text'} />
                 <Field id={'description'} name={'description'} label={'Server Description'} type={'text'} />
                 <div className={`mt-6 text-right`}>
-                    <ActionButton variant='primary' type={'submit'}>
+                    <Button variant='secondary' type={'submit'}>
                         Save
-                    </ActionButton>
+                    </Button>
                 </div>
             </Form>
         </TitledGreyBox>

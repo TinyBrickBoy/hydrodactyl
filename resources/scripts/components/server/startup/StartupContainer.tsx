@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
-
-import ActionButton from '@/components/elements/ActionButton';
+import { httpErrorToHuman } from '@/api/http';
+import processStartupCommand from '@/api/server/processStartupCommand';
+import resetStartupCommand from '@/api/server/resetStartupCommand';
+import revertDockerImage from '@/api/server/revertDockerImage';
+import setSelectedDockerImage from '@/api/server/setSelectedDockerImage';
+import updateStartupCommand from '@/api/server/updateStartupCommand';
+import getServerStartup from '@/api/swr/getServerStartup';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import {
     DropdownMenu,
@@ -10,6 +15,7 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from '@/components/elements/DropdownMenu';
+import { Dialog } from '@/components/elements/dialog';
 import InputSpinner from '@/components/elements/InputSpinner';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
@@ -17,22 +23,13 @@ import { ServerError } from '@/components/elements/ScreenBlock';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
-import { Dialog } from '@/components/elements/dialog';
+import ServerHeader from '@/components/server/header/ServerHeader';
 import VariableBox from '@/components/server/startup/VariableBox';
-
-import { httpErrorToHuman } from '@/api/http';
-import processStartupCommand from '@/api/server/processStartupCommand';
-import resetStartupCommand from '@/api/server/resetStartupCommand';
-import revertDockerImage from '@/api/server/revertDockerImage';
-import setSelectedDockerImage from '@/api/server/setSelectedDockerImage';
-import updateStartupCommand from '@/api/server/updateStartupCommand';
-import getServerStartup from '@/api/swr/getServerStartup';
-
-import { ServerContext } from '@/state/server';
-
+import { Button } from '@/components/ui/button';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import useFlash from '@/plugins/useFlash';
 import { usePermissions } from '@/plugins/usePermissions';
+import { ServerContext } from '@/state/server';
 
 const StartupContainer = () => {
     const [loading, setLoading] = useState(false);
@@ -197,6 +194,7 @@ const StartupContainer = () => {
         )
     ) : (
         <ServerContentBlock title={'Startup Settings'} showFlashKey={'startup:image'}>
+            <ServerHeader />
             <Dialog.Confirm
                 open={revertModalVisible}
                 title={'Revert Docker Image'}
@@ -282,35 +280,31 @@ const StartupContainer = () => {
                                 </div>
                                 <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-[#ffffff08]'>
                                     <InputSpinner visible={commandLoading}>
-                                        <ActionButton
-                                            variant='primary'
-                                            size='md'
+                                        <Button
                                             onClick={updateCommand}
                                             disabled={commandLoading || !commandValue.trim()}
                                             className='w-full sm:w-auto sm:flex-1 lg:flex-none lg:min-w-[140px]'
                                         >
                                             {commandLoading && <Spinner size='small' />}
                                             {commandLoading ? 'Saving...' : 'Save Command'}
-                                        </ActionButton>
+                                        </Button>
                                     </InputSpinner>
-                                    <ActionButton
+                                    <Button
                                         variant='secondary'
-                                        size='md'
                                         onClick={loadDefaultCommand}
                                         disabled={commandLoading}
                                         className='w-full sm:w-auto sm:flex-1 lg:flex-none lg:min-w-[140px]'
                                     >
                                         Load Default
-                                    </ActionButton>
-                                    <ActionButton
+                                    </Button>
+                                    <Button
                                         variant='secondary'
-                                        size='md'
                                         onClick={cancelEditingCommand}
                                         disabled={commandLoading}
                                         className='w-full sm:w-auto sm:flex-1 lg:flex-none lg:min-w-[140px]'
                                     >
                                         Cancel
-                                    </ActionButton>
+                                    </Button>
                                 </div>
                             </div>
                         ) : (
@@ -320,14 +314,14 @@ const StartupContainer = () => {
                                         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3'>
                                             <label className='text-sm font-medium text-neutral-300'>Raw Command</label>
                                             {canEditCommand && (
-                                                <ActionButton
+                                                <Button
                                                     variant='secondary'
-                                                    size='sm'
+                                                    size='default'
                                                     onClick={startEditingCommand}
                                                     className='w-full sm:w-auto'
                                                 >
                                                     Edit Command
-                                                </ActionButton>
+                                                </Button>
                                             )}
                                         </div>
                                         <CopyOnClick text={data.rawStartupCommand}>
@@ -465,7 +459,7 @@ const StartupContainer = () => {
                                             {canEditDockerImage && (
                                                 <div className='flex-shrink-0'>
                                                     <InputSpinner visible={loading}>
-                                                        <ActionButton
+                                                        <Button
                                                             variant='secondary'
                                                             size='sm'
                                                             onClick={() => setRevertModalVisible(true)}
@@ -474,7 +468,7 @@ const StartupContainer = () => {
                                                         >
                                                             {loading && <Spinner size='small' />}
                                                             Revert to Default
-                                                        </ActionButton>
+                                                        </Button>
                                                     </InputSpinner>
                                                 </div>
                                             )}

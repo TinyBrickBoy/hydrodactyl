@@ -1,4 +1,4 @@
-import PageContentBlock, { PageContentBlockProps } from '@/components/elements/PageContentBlock';
+import PageContentBlock, { type PageContentBlockProps } from '@/components/elements/PageContentBlock';
 
 import { ServerContext } from '@/state/server';
 

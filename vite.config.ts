@@ -1,9 +1,9 @@
+import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react-swc';
 import * as child from 'child_process';
 import fs from 'fs';
 import laravel from 'laravel-vite-plugin';
 import million from 'million/compiler';
-import { fileURLToPath } from 'node:url';
 import path from 'path';
 import { dirname, resolve } from 'pathe';
 import { defineConfig } from 'vite';
@@ -128,9 +128,8 @@ export default defineConfig({
         warmup: {
             clientFiles: [
                 'resources/scripts/index.tsx',
-                'resources/scripts/routers/DashboardRouter.tsx',
+                'resources/scripts/routers/UnifiedRouter.tsx',
                 'resources/scripts/components/dashboard/DashboardContainer.tsx',
-                'resources/scripts/routers/ServerRouter.tsx',
             ],
         },
     },

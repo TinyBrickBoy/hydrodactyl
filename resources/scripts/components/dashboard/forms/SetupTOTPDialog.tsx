@@ -1,24 +1,19 @@
 // FIXME: replace with radix tooltip
 // import Tooltip from '@/components/elements/tooltip/Tooltip';
-import { Actions, useStoreActions } from 'easy-peasy';
+import { type Actions, useStoreActions } from 'easy-peasy';
 import { QRCodeSVG } from 'qrcode.react';
 import { useContext, useEffect, useState } from 'react';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import enableAccountTwoFactor from '@/api/account/enableAccountTwoFactor';
+import getTwoFactorTokenData, { type TwoFactorTokenData } from '@/api/account/getTwoFactorTokenData';
 import CopyOnClick from '@/components/elements/CopyOnClick';
-import Spinner from '@/components/elements/Spinner';
 import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
 import { Input } from '@/components/elements/inputs';
-
+import Spinner from '@/components/elements/Spinner';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import { Button } from '@/components/ui/button';
 import asDialog from '@/hoc/asDialog';
-
-import enableAccountTwoFactor from '@/api/account/enableAccountTwoFactor';
-import getTwoFactorTokenData, { TwoFactorTokenData } from '@/api/account/getTwoFactorTokenData';
-
-import { ApplicationStore } from '@/state';
-
 import { useFlashKey } from '@/plugins/useFlash';
+import type { ApplicationStore } from '@/state';
 
 interface Props {
     onTokens: (tokens: string[]) => void;
@@ -105,26 +100,25 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
                 onChange={(e) => setPassword(e.currentTarget.value)}
             />
             <Dialog.Footer>
-                <ActionButton variant='secondary' onClick={close}>
+                <Button variant='secondary' onClick={close}>
                     Cancel
-                </ActionButton>
+                </Button>
                 {/* <Tooltip
-                    disabled={password.length > 0 && value.length === 6}
-                    content={
-                        !token
-                            ? 'Waiting for QR code to load...'
-                            : 'You must enter the 6-digit code and your password to continue.'
-                    }
-                    delay={100}
-                > */}
-                <ActionButton
-                    variant='primary'
+          disabled={password.length > 0 && value.length === 6}
+          content={
+            !token
+              ? 'Waiting for QR code to load...'
+              : 'You must enter the 6-digit code and your password to continue.'
+          }
+          delay={100}
+        > */}
+                <Button
                     disabled={!token || value.length !== 6 || !password.length}
                     type={'submit'}
                     form={'enable-totp-form'}
                 >
                     Enable
-                </ActionButton>
+                </Button>
                 {/* </Tooltip> */}
             </Dialog.Footer>
         </form>

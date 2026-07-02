@@ -1,15 +1,13 @@
 import { ArrowsRotateRight } from '@gravity-ui/icons';
-import { Actions, useStoreActions } from 'easy-peasy';
+import { type Actions, useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
-
-import ActionButton from '@/components/elements/ActionButton';
-import Spinner from '@/components/elements/Spinner';
-
 import { httpErrorToHuman } from '@/api/http';
-import { ServerDatabase } from '@/api/server/databases/getServerDatabases';
+import type { ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import rotateDatabasePassword from '@/api/server/databases/rotateDatabasePassword';
+import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
 
-import { ApplicationStore } from '@/state';
+import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
 const RotatePasswordButton = ({
@@ -50,12 +48,12 @@ const RotatePasswordButton = ({
     };
 
     return (
-        <ActionButton onClick={rotate} className='flex-none'>
+        <Button onClick={rotate} className='flex-none'>
             <div className='flex justify-center items-center'>
                 {!loading && <ArrowsRotateRight width={22} height={22} />}
                 {loading && <Spinner size={'small'} />}
             </div>
-        </ActionButton>
+        </Button>
     );
 };
 

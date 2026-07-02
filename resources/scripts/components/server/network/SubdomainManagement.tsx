@@ -1,23 +1,18 @@
-import { Link } from '@gravity-ui/icons';
-import { Field, Form, Formik, FormikHelpers } from 'formik';
+import { Field, Form, Formik, type FormikHelpers } from 'formik';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import * as yup from 'yup';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
-import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
-
 import {
-    SubdomainInfo,
     checkSubdomainAvailability,
     deleteSubdomain,
     getSubdomainInfo,
+    type SubdomainInfo,
     setSubdomain,
 } from '@/api/server/network/subdomain';
-
-import { ServerContext } from '@/state/server';
-
+import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import { Button } from '@/components/ui/button';
 import { useFlashKey } from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 interface AvailableDomain {
     id: number;
@@ -68,7 +63,11 @@ const validationSchema = yup.object().shape({
     domain_id: yup.string().required('A domain must be selected.'),
 });
 
-const SubdomainManagement = () => {
+interface Props {
+    onClose?: () => void;
+}
+
+const SubdomainManagement = ({ onClose }: Props) => {
     const [loading, setLoading] = useState(false);
     const [subdomainInfo, setSubdomainInfo] = useState<SubdomainInfo | null>(null);
     const [checkingAvailability, setCheckingAvailability] = useState(false);
@@ -204,68 +203,57 @@ const SubdomainManagement = () => {
 
     if (!subdomainInfo) {
         return (
-            <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-6 shadow-sm'>
-                <div className='flex items-center justify-center py-12'>
-                    <div className='flex flex-col items-center gap-3'>
-                        <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-brand'></div>
-                        <p className='text-sm text-neutral-400'>Loading subdomain configuration...</p>
-                    </div>
+            <div className='flex items-center justify-center py-12'>
+                <div className='flex flex-col items-center gap-3'>
+                    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-brand'></div>
+                    <p className='text-sm text-neutral-400'>Loading subdomain configuration...</p>
                 </div>
             </div>
         );
     }
 
     if (!subdomainInfo?.supported) {
-        return null; // Don't show anything if subdomains aren't supported
+        return null;
     }
 
     if (!subdomainInfo?.available_domains || subdomainInfo.available_domains.length === 0) {
         return (
-            <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-6 shadow-sm'>
-                <div className='flex items-center justify-between mb-6'>
-                    <h3 className='text-xl font-extrabold tracking-tight'>Subdomain Management</h3>
-                </div>
-                <div className='flex flex-col items-center justify-center py-12'>
-                    <div className='text-center'>
-                        <div className='w-12 h-12 mx-auto mb-3 rounded-full bg-[#ffffff11] flex items-center justify-center'>
-                            <svg className='w-6 h-6 text-zinc-400' fill='currentColor' viewBox='0 0 20 20'>
-                                <path
-                                    fillRule='evenodd'
-                                    d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
-                                    clipRule='evenodd'
-                                />
-                            </svg>
-                        </div>
-                        <h4 className='text-md font-medium text-zinc-200 mb-1'>No domains configured</h4>
-                        <p className='text-sm text-zinc-400 max-w-sm'>
-                            Contact your administrator to configure subdomain support for this server.
-                        </p>
+            <div className='flex flex-col items-center justify-center py-12'>
+                <div className='text-center'>
+                    <div className='w-12 h-12 mx-auto mb-3 rounded-full bg-[#ffffff11] flex items-center justify-center'>
+                        <svg className='w-6 h-6 text-zinc-400' fill='currentColor' viewBox='0 0 20 20'>
+                            <path
+                                fillRule='evenodd'
+                                d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
+                                clipRule='evenodd'
+                            />
+                        </svg>
                     </div>
+                    <h4 className='text-md font-medium text-zinc-200 mb-1'>No domains configured</h4>
+                    <p className='text-sm text-zinc-400 max-w-sm'>
+                        Contact your administrator to configure subdomain support for this server.
+                    </p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-6 shadow-sm'>
-            <div className='flex items-center gap-3 mb-6'>
-                <Link className='w-6 h-6 text-zinc-400' fill='currentColor' />
-                <h3 className='text-xl font-extrabold tracking-tight'>Subdomain Management</h3>
-                {subdomainInfo?.current_subdomain && (
-                    <div className='flex items-center gap-2 text-sm ml-auto'>
-                        <div
-                            className={`w-2 h-2 rounded-full ${subdomainInfo.current_subdomain.attributes.is_active ? 'bg-green-400' : 'bg-red-400'}`}
-                        ></div>
-                        <span
-                            className={
-                                subdomainInfo.current_subdomain.attributes.is_active ? 'text-green-400' : 'text-red-400'
-                            }
-                        >
-                            {subdomainInfo.current_subdomain.attributes.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                    </div>
-                )}
-            </div>
+        <div>
+            {subdomainInfo?.current_subdomain && (
+                <div className='flex items-center gap-2 text-sm mb-4'>
+                    <div
+                        className={`w-2 h-2 rounded-full ${subdomainInfo.current_subdomain.attributes.is_active ? 'bg-green-400' : 'bg-red-400'}`}
+                    ></div>
+                    <span
+                        className={
+                            subdomainInfo.current_subdomain.attributes.is_active ? 'text-green-400' : 'text-red-400'
+                        }
+                    >
+                        {subdomainInfo.current_subdomain.attributes.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                </div>
+            )}
 
             <FlashMessageRender byKey={'server:network:subdomain'} />
 
@@ -283,24 +271,12 @@ const SubdomainManagement = () => {
                         </div>
                     </div>
                     <div className='flex items-center justify-end gap-3 pt-4 border-t border-[#ffffff15]'>
-                        <ActionButton
-                            type='button'
-                            variant='danger'
-                            onClick={handleDeleteSubdomain}
-                            disabled={loading}
-                            size='sm'
-                        >
+                        <Button type='button' variant='attention' onClick={handleDeleteSubdomain} disabled={loading}>
                             {loading ? 'Deleting...' : 'Delete Subdomain'}
-                        </ActionButton>
-                        <ActionButton
-                            type='button'
-                            variant='primary'
-                            onClick={() => setIsEditing(true)}
-                            disabled={loading}
-                            size='sm'
-                        >
+                        </Button>
+                        <Button type='button' variant='secondary' onClick={() => setIsEditing(true)} disabled={loading}>
                             Edit Subdomain
-                        </ActionButton>
+                        </Button>
                     </div>
                 </div>
             ) : (
@@ -402,10 +378,9 @@ const SubdomainManagement = () => {
                             <div className='flex items-center justify-end gap-3 pt-6 border-t border-[#ffffff15]'>
                                 {isEditing ? (
                                     <>
-                                        <ActionButton
+                                        <Button
                                             type='button'
                                             variant='secondary'
-                                            size='sm'
                                             onClick={() => {
                                                 setIsEditing(false);
                                                 resetForm();
@@ -414,11 +389,10 @@ const SubdomainManagement = () => {
                                             disabled={isSubmitting || loading}
                                         >
                                             Cancel
-                                        </ActionButton>
-                                        <ActionButton
+                                        </Button>
+                                        <Button
                                             type='submit'
-                                            variant='primary'
-                                            size='sm'
+                                            variant='secondary'
                                             disabled={
                                                 isSubmitting ||
                                                 loading ||
@@ -429,13 +403,12 @@ const SubdomainManagement = () => {
                                             }
                                         >
                                             {isSubmitting ? 'Saving...' : 'Save Changes'}
-                                        </ActionButton>
+                                        </Button>
                                     </>
                                 ) : (
-                                    <ActionButton
+                                    <Button
                                         type='submit'
-                                        variant='primary'
-                                        size='sm'
+                                        variant='secondary'
                                         disabled={
                                             isSubmitting ||
                                             loading ||
@@ -446,7 +419,7 @@ const SubdomainManagement = () => {
                                         }
                                     >
                                         {isSubmitting ? 'Creating...' : 'Create Subdomain'}
-                                    </ActionButton>
+                                    </Button>
                                 )}
                             </div>
                         </Form>

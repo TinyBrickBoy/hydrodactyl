@@ -1,15 +1,15 @@
 import { useStoreState } from 'easy-peasy';
 import isEqual from 'react-fast-compare';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
 import Can from '@/components/elements/Can';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import Label from '@/components/elements/Label';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import ServerHeader from '@/components/server/header/ServerHeader';
 import ReinstallServerBox from '@/components/server/settings/ReinstallServerBox';
+import { Button } from '@/components/ui/button';
 
 import { ip } from '@/lib/formatters';
 
@@ -26,6 +26,7 @@ const SettingsContainer = () => {
 
     return (
         <ServerContentBlock title={'Settings'}>
+            <ServerHeader />
             <FlashMessageRender byKey={'settings'} />
             <MainPageHeader direction='column' title={'Settings'}>
                 <p className='text-sm text-neutral-400 leading-relaxed'>
@@ -83,7 +84,7 @@ const SettingsContainer = () => {
                             </div>
                             <div className={`ml-4`}>
                                 <a href={`sftp://${username}.${id}@${ip(sftp.ip)}:${sftp.port}`}>
-                                    <ActionButton variant='secondary'>Launch SFTP</ActionButton>
+                                    <Button variant='secondary'>Launch SFTP</Button>
                                 </a>
                             </div>
                         </div>

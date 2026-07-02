@@ -1,77 +1,79 @@
 import { ChevronLeft, Person } from '@gravity-ui/icons';
+import { type Actions, useStoreActions } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { httpErrorToHuman } from '@/api/http';
+import getServerSubusers from '@/api/server/users/getServerSubusers';
 
-import ActionButton from '@/components/elements/ActionButton';
-import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
+import ServerHeader from '@/components/server/header/ServerHeader';
 import UserFormComponent from '@/components/server/users/UserFormComponent';
-
+import { Button } from '@/components/ui/button';
+import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
-import { Subuser } from '@/state/server/subusers';
+import type { Subuser } from '@/state/server/subusers';
 
 const EditUserContainer = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [fetching, setFetching] = useState(false);
 
     const serverId = ServerContext.useStoreState((state) => state.server.data!.id);
+    const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const subusers = ServerContext.useStoreState((state) => state.subusers.data);
+    const setSubusers = ServerContext.useStoreActions((actions) => actions.subusers.setSubusers);
+    const { addError } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
 
-    // Find the subuser by UUID
     const subuser = subusers.find((s: Subuser) => s.uuid === id);
 
     useEffect(() => {
-        // If subuser not found, redirect back to users list
-        if (!subuser && subusers.length > 0) {
+        if (subusers.length === 0 && uuid) {
+            setFetching(true);
+            getServerSubusers(uuid)
+                .then((users) => {
+                    setSubusers(users);
+                    setFetching(false);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    addError({ key: 'users', message: httpErrorToHuman(error) });
+                    setFetching(false);
+                });
+        }
+    }, [uuid]);
+
+    useEffect(() => {
+        if (!fetching && subusers.length > 0 && !subuser) {
             navigate(`/server/${serverId}/users`);
         }
-    }, [subuser, subusers, navigate, serverId]);
+    }, [fetching, subuser, subusers, navigate, serverId]);
 
-    const handleSuccess = () => {
+    const handleBack = () => {
         navigate(`/server/${serverId}/users`);
     };
 
-    const handleCancel = () => {
-        navigate(`/server/${serverId}/users`);
-    };
+    const isLoading = fetching || (!subuser && subusers.length === 0);
 
-    // Show loading state while we're waiting for subusers to load
-    if (!subuser && subusers.length === 0) {
-        return (
-            <ServerContentBlock title={'Edit User'}>
-                <MainPageHeader title={'Edit User'}>
-                    <ActionButton
-                        variant='secondary'
-                        onClick={() => navigate(`/server/${serverId}/users`)}
-                        className='flex items-center gap-2'
-                    >
-                        <ChevronLeft width={22} height={22} fill='currentColor' />
+    return (
+        <ServerContentBlock title={'Edit User'} className='p-0!'>
+            {subuser && <ServerHeader />}
+
+            <div className='px-2 pt-2 sm:px-14 sm:pt-14 flex flex-col sm:flex-row items-center gap-4'>
+                <div className='flex gap-2'>
+                    <Button variant='secondary' onClick={handleBack} className='gap-2' disabled={isSubmitting}>
+                        <ChevronLeft width={22} height={22} className='w-4 h-4' fill='currentColor' />
                         Back to Users
-                    </ActionButton>
-                </MainPageHeader>
+                    </Button>
+                </div>
+            </div>
+
+            {isLoading ? (
                 <div className='flex items-center justify-center py-12'>
                     <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-brand'></div>
                 </div>
-            </ServerContentBlock>
-        );
-    }
-
-    // If subuser not found after loading, show not found message
-    if (!subuser) {
-        return (
-            <ServerContentBlock title={'Edit User'}>
-                <MainPageHeader title={'Edit User'}>
-                    <ActionButton
-                        variant='secondary'
-                        onClick={() => navigate(`/server/${serverId}/users`)}
-                        className='flex items-center gap-2'
-                    >
-                        <ChevronLeft width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                        Back to Users
-                    </ActionButton>
-                </MainPageHeader>
-                <div className='flex flex-col items-center justify-center py-12 px-4'>
+            ) : !subuser ? (
+                <div className='flex flex-col items-center justify-center min-h-[60vh] py-12 px-4'>
                     <div className='text-center'>
                         <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-[#ffffff11] flex items-center justify-center'>
                             <Person width={22} height={22} className='w-8 h-8 text-zinc-400' fill='currentColor' />
@@ -82,32 +84,21 @@ const EditUserContainer = () => {
                         </p>
                     </div>
                 </div>
-            </ServerContentBlock>
-        );
-    }
-
-    return (
-        <ServerContentBlock title={'Edit User'}>
-            <MainPageHeader title={`Edit User: ${subuser.email}`}>
-                <ActionButton
-                    variant='secondary'
-                    onClick={() => navigate(`/server/${serverId}/users`)}
-                    className='flex items-center gap-2'
-                    disabled={isSubmitting}
-                >
-                    <ChevronLeft width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                    Back to Users
-                </ActionButton>
-            </MainPageHeader>
-
-            <UserFormComponent
-                subuser={subuser}
-                onSuccess={handleSuccess}
-                onCancel={handleCancel}
-                flashKey='user:edit'
-                isSubmitting={isSubmitting}
-                setIsSubmitting={setIsSubmitting}
-            />
+            ) : (
+                <div className='px-2 sm:px-14 pt-6'>
+                    <h1 className='text-[52px] font-extrabold leading-[98%] tracking-[-0.14rem] mb-8'>
+                        Editing: {subuser.email}
+                    </h1>
+                    <UserFormComponent
+                        subuser={subuser}
+                        onSuccess={handleBack}
+                        onCancel={handleBack}
+                        flashKey='user:edit'
+                        isSubmitting={isSubmitting}
+                        setIsSubmitting={setIsSubmitting}
+                    />
+                </div>
+            )}
         </ServerContentBlock>
     );
 };

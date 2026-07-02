@@ -1,17 +1,15 @@
-import { Actions, State, useStoreActions, useStoreState } from 'easy-peasy';
-import { Form, Formik, FormikHelpers } from 'formik';
+import { type Actions, type State, useStoreActions, useStoreState } from 'easy-peasy';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { Fragment } from 'react';
 import * as Yup from 'yup';
-
-import ActionButton from '@/components/elements/ActionButton';
+import updateAccountPassword from '@/api/account/updateAccountPassword';
+import { httpErrorToHuman } from '@/api/http';
 import Field from '@/components/elements/Field';
 import Spinner from '@/components/elements/Spinner';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import { Button } from '@/components/ui/button';
 
-import updateAccountPassword from '@/api/account/updateAccountPassword';
-import { httpErrorToHuman } from '@/api/http';
-
-import { ApplicationStore } from '@/state';
+import type { ApplicationStore } from '@/state';
 
 interface Values {
     current: string;
@@ -94,10 +92,10 @@ const UpdatePasswordForm = () => {
                                 />
                             </div>
                             <div className={`mt-6`}>
-                                <ActionButton variant='primary' disabled={isSubmitting || !isValid}>
+                                <Button variant='secondary' disabled={isSubmitting || !isValid}>
                                     {isSubmitting && <Spinner size='small' />}
                                     {isSubmitting ? 'Updating...' : 'Update Password'}
-                                </ActionButton>
+                                </Button>
                             </div>
                         </Form>
                     </Fragment>

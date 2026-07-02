@@ -1,5 +1,5 @@
 import http from '@/api/http';
-import { FileObject } from '@/api/server/files/loadDirectory';
+import type { FileObject } from '@/api/server/files/loadDirectory';
 import { getGlobalDaemonType } from '@/api/server/getServer';
 import { rawDataToFileObject } from '@/api/transformers';
 

@@ -102,7 +102,11 @@
                         <h3>{{ humanizeSize($storageUsed) }}</h3>
                         <p>Estimated Storage Usage</p>
                     </div>
+<<<<<<< HEAD
+                    <div class="icon"><i class="fa bi-bucket-fill"></i></div>
+=======
                     <div class="icon"><i class="fa fa-cloud"></i></div>
+>>>>>>> main
                 </div>
             </div>
         </div>

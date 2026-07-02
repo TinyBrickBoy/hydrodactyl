@@ -1,26 +1,24 @@
-import { For } from 'million/react';
+import { Plus } from '@gravity-ui/icons';
 import { useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
-import Can from '@/components/elements/Can';
-import { MainPageHeader } from '@/components/elements/MainPageHeader';
-import ServerContentBlock from '@/components/elements/ServerContentBlock';
-import { PageListContainer } from '@/components/elements/pages/PageList';
-import AllocationRow from '@/components/server/network/AllocationRow';
-import SubdomainManagement from '@/components/server/network/SubdomainManagement';
-
 import createServerAllocation from '@/api/server/network/createServerAllocation';
 import getServerAllocations from '@/api/swr/getServerAllocations';
-
-import { ServerContext } from '@/state/server';
-
+import Can from '@/components/elements/Can';
+import { Dialog } from '@/components/elements/dialog';
+import ServerContentBlock from '@/components/elements/ServerContentBlock';
+import VirtualizedList from '@/components/elements/VirtualizedList';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import ServerHeader from '@/components/server/header/ServerHeader';
+import AllocationRow from '@/components/server/network/AllocationRow';
+import SubdomainManagement from '@/components/server/network/SubdomainManagement';
+import { Button } from '@/components/ui/button';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import { useFlashKey } from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 const NetworkContainer = () => {
     const [_, setLoading] = useState(false);
+    const [showSubdomainModal, setShowSubdomainModal] = useState(false);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const allocationLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.allocations);
     const allocations = ServerContext.useStoreState((state) => state.server.data!.allocations, isEqual);
@@ -49,7 +47,10 @@ const NetworkContainer = () => {
         setLoading(true);
         createServerAllocation(uuid)
             .then((allocation) => {
-                setServerFromState((s) => ({ ...s, allocations: s.allocations.concat(allocation) }));
+                setServerFromState((s) => ({
+                    ...s,
+                    allocations: s.allocations.concat(allocation),
+                }));
                 return mutate(data?.concat(allocation), false);
             })
             .catch((error) => clearAndAddHttpError(error))
@@ -57,46 +58,38 @@ const NetworkContainer = () => {
     };
 
     return (
-        <ServerContentBlock title={'Network'}>
+        <ServerContentBlock title={'Network'} className='p-0!'>
+            <ServerHeader />
             <FlashMessageRender byKey={'server:network'} />
 
-            <MainPageHeader direction='column' title={'Networking'}>
-                <p className='text-sm text-neutral-400 leading-relaxed'>
-                    Configure network settings for your server. Manage subdomains, IP addresses and ports that your
-                    server can bind to for incoming connections.
-                </p>
-            </MainPageHeader>
-
-            <div className='space-y-12'>
-                <SubdomainManagement />
-
-                <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-6 shadow-sm mt-8'>
-                    <div className='flex items-center justify-between mb-6'>
-                        <h3 className='text-xl font-extrabold tracking-tight'>Port Allocations</h3>
+            <div className=''>
+                <div className='rounded-xl shadow-sm px-14 py-14'>
+                    <div className='flex items-center justify-between mb-2'>
                         {data && (
                             <Can action={'allocation.create'}>
                                 <div className='flex items-center gap-4'>
-                                    {allocationLimit === null && (
-                                        <span className='text-sm text-zinc-400 bg-[#ffffff08] px-3 py-1 rounded-lg border border-[#ffffff15]'>
-                                            {data.length} allocations (unlimited)
-                                        </span>
-                                    )}
-                                    {allocationLimit > 0 && (
-                                        <span className='text-sm text-zinc-400 bg-[#ffffff08] px-3 py-1 rounded-lg border border-[#ffffff15]'>
-                                            {data.length} of {allocationLimit}
-                                        </span>
-                                    )}
-                                    {allocationLimit === 0 && (
-                                        <span className='text-sm text-red-400 bg-[#ffffff08] px-3 py-1 rounded-lg border border-[#ffffff15]'>
-                                            Allocations disabled
-                                        </span>
-                                    )}
-                                    {(allocationLimit === null ||
-                                        (allocationLimit > 0 && allocationLimit > data.length)) && (
-                                        <ActionButton variant='primary' onClick={onCreateAllocation} size='sm'>
+                                    {(allocationLimit === null || data.length < allocationLimit) && (
+                                        <Button variant='secondary' className='gap-2' onClick={onCreateAllocation}>
+                                            <Plus width={22} height={22} className='w-4 h-4' fill='currentColor' />
                                             New Allocation
-                                        </ActionButton>
+                                        </Button>
                                     )}
+                                    <Button
+                                        variant='outline'
+                                        className='gap-2'
+                                        onClick={() => setShowSubdomainModal(true)}
+                                    >
+                                        Subdomains
+                                    </Button>
+                                    <span
+                                        className={`text-sm ${allocationLimit === 0 ? 'text-red-400' : 'text-zinc-300'} gap-0.5`}
+                                    >
+                                        {allocationLimit === null
+                                            ? `${data.length} allocations `
+                                            : allocationLimit === 0
+                                              ? 'Allocations disabled'
+                                              : `${data.length} of ${allocationLimit}`}
+                                    </span>
                                 </div>
                             </Can>
                         )}
@@ -110,16 +103,12 @@ const NetworkContainer = () => {
                             </div>
                         </div>
                     ) : data.length > 0 ? (
-                        <PageListContainer data-pyro-network-container-allocations>
-                            <For each={data} memo>
-                                {(allocation) => (
-                                    <AllocationRow
-                                        key={`${allocation.ip}:${allocation.port}`}
-                                        allocation={allocation}
-                                    />
-                                )}
-                            </For>
-                        </PageListContainer>
+                        <VirtualizedList
+                            items={[...data].sort((a, b) => (a.isDefault ? -1 : b.isDefault ? 1 : 0))}
+                            renderItem={(allocation) => <AllocationRow allocation={allocation} />}
+                            estimateSize={() => 80}
+                            gap={12}
+                        />
                     ) : (
                         <div className='flex flex-col items-center justify-center py-12'>
                             <div className='text-center'>
@@ -145,6 +134,9 @@ const NetworkContainer = () => {
                     )}
                 </div>
             </div>
+            <Dialog open={showSubdomainModal} onClose={() => setShowSubdomainModal(false)} title='Subdomain Management'>
+                <SubdomainManagement onClose={() => setShowSubdomainModal(false)} />
+            </Dialog>
         </ServerContentBlock>
     );
 };

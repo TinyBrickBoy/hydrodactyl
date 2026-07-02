@@ -1,12 +1,11 @@
-import ModalContext from '@/context/ModalContext';
+import { Activity02Icon } from '@hugeicons/core-free-icons';
 import { useContext } from 'react';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 
+import FlashMessageRender from '@/components/FlashMessageRender';
+import { Button } from '@/components/ui/button';
+import ModalContext from '@/context/ModalContext';
 import asModal from '@/hoc/asModal';
-
-import ActionButton from '../elements/ActionButton';
 
 interface Props {
     apiKey: string;
@@ -40,9 +39,9 @@ const ApiKeyModal = ({ apiKey }: Props) => {
 
             {/* Action Buttons */}
             <div className='flex justify-end space-x-4'>
-                <ActionButton type='button' onClick={() => dismiss()} variant='danger' className='flex items-center'>
+                <Button variant='destructive' onClick={() => dismiss()}>
                     Close
-                </ActionButton>
+                </Button>
             </div>
         </div>
     );

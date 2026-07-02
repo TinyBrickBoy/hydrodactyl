@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { SocketEvent } from '@/components/server/events';
+import type { SocketEvent } from '@/components/server/events';
 
 import { ServerContext } from '@/state/server';
 

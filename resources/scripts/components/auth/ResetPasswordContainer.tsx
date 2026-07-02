@@ -1,18 +1,15 @@
-import { Formik, FormikHelpers } from 'formik';
+import { Formik, type FormikHelpers } from 'formik';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { object, ref, string } from 'yup';
-
+import performPasswordReset from '@/api/auth/performPasswordReset';
 import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import Button from '@/components/elements/Button';
 import Captcha, { getCaptchaResponse } from '@/components/elements/Captcha';
 import ContentBox from '@/components/elements/ContentBox';
 import Field from '@/components/elements/Field';
 import Input from '@/components/elements/Input';
-
 import CaptchaManager from '@/lib/captcha';
-
-import performPasswordReset from '@/api/auth/performPasswordReset';
 
 import useFlash from '@/plugins/useFlash';
 
@@ -45,7 +42,11 @@ function ResetPasswordContainer() {
         // Get captcha response if enabled
         const captchaResponse = getCaptchaResponse();
 
-        let resetData: any = { token: params.token ?? '', password, password_confirmation };
+        let resetData: any = {
+            token: params.token ?? '',
+            password,
+            password_confirmation,
+        };
         if (CaptchaManager.isEnabled()) {
             const fieldName = CaptchaManager.getProviderInstance().getResponseFieldName();
 
@@ -63,7 +64,9 @@ function ResetPasswordContainer() {
                 } else {
                     console.error('Captcha enabled but no response available');
                     console.log(captchaResponse);
-                    clearAndAddHttpError({ error: new Error('Please complete the captcha verification.') });
+                    clearAndAddHttpError({
+                        error: new Error('Please complete the captcha verification.'),
+                    });
                     setSubmitting(false);
                     return;
                 }

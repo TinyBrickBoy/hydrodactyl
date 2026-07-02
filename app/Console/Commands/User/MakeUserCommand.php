@@ -9,7 +9,7 @@ class MakeUserCommand extends Command
 {
     protected $description = 'Creates a user on the system via the CLI.';
 
-    protected $signature = 'p:user:make {--email=} {--username=} {--name-first=} {--name-last=} {--password=} {--admin=} {--no-password}';
+    protected $signature = 'p:user:make {--email=} {--username=} {--name-first=} {--name-last=} {--password=} {--admin} {--no-password}';
 
     /**
      * MakeUserCommand constructor.

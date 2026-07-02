@@ -2,7 +2,7 @@ import { Shield } from '@gravity-ui/icons';
 import clsx from 'clsx';
 import { useContext, useEffect } from 'react';
 
-import { DialogContext, DialogIconProps, styles } from './';
+import { DialogContext, type DialogIconProps, styles } from './';
 
 // const icons = {
 //     danger: ShieldExclamationIcon,

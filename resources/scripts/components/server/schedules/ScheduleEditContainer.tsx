@@ -1,26 +1,23 @@
 import { format } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
-import { useNavigate, useParams } from 'react-router-dom';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import { useParams } from 'react-router-dom';
+import getServerSchedule from '@/api/server/schedules/getServerSchedule';
+import triggerScheduleExecution from '@/api/server/schedules/triggerScheduleExecution';
 import Can from '@/components/elements/Can';
+import { Dialog } from '@/components/elements/dialog';
 import ItemContainer from '@/components/elements/ItemContainer';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
-import DeleteScheduleButton from '@/components/server/schedules/DeleteScheduleButton';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import ServerHeader from '@/components/server/header/ServerHeader';
 import EditScheduleModal from '@/components/server/schedules/EditScheduleModal';
 import ScheduleTaskRow from '@/components/server/schedules/ScheduleTaskRow';
 import TaskDetailsModal from '@/components/server/schedules/TaskDetailsModal';
-
-import getServerSchedule from '@/api/server/schedules/getServerSchedule';
-import triggerScheduleExecution from '@/api/server/schedules/triggerScheduleExecution';
-
-import { ServerContext } from '@/state/server';
-
+import { Button } from '@/components/ui/button';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 const CronBox = ({ title, value }: { title: string; value: string }) => (
     <ItemContainer title={title} description={value} />
@@ -34,7 +31,6 @@ const ActivePill = ({ active }: { active: boolean }) => (
 
 const ScheduleEditContainer = () => {
     const { id: scheduleId } = useParams<'id'>();
-    const navigate = useNavigate();
 
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
@@ -88,6 +84,7 @@ const ScheduleEditContainer = () => {
 
     return (
         <PageContentBlock title={'Schedules'}>
+            <ServerHeader />
             <FlashMessageRender byKey={'schedules'} />
             {!schedule || isLoading ? (
                 <Spinner size={'large'} centered />
@@ -130,20 +127,16 @@ const ScheduleEditContainer = () => {
                         </div>
                         <div className={`flex gap-2 flex-col md:flex-row md:min-w-0 min-w-full`}>
                             <Can action={'schedule.update'}>
-                                <ActionButton
-                                    variant='secondary'
-                                    onClick={toggleEditModal}
-                                    className={'flex-1 min-w-max'}
-                                >
+                                <Button variant='secondary' onClick={toggleEditModal} className={'flex-1 min-w-max'}>
                                     Edit
-                                </ActionButton>
-                                <ActionButton
-                                    variant='primary'
+                                </Button>
+                                <Button
+                                    variant='secondary'
                                     onClick={() => setShowTaskModal(true)}
                                     className={'flex-1 min-w-max'}
                                 >
                                     New Task
-                                </ActionButton>
+                                </Button>
                             </Can>
                         </div>
                     </div>
@@ -169,32 +162,25 @@ const ScheduleEditContainer = () => {
                                   ))
                             : null}
                     </div>
-                    <EditScheduleModal visible={showEditModal} schedule={schedule} onModalDismissed={toggleEditModal} />
+                    <EditScheduleModal visible={showEditModal} schedule={schedule} onDismissed={toggleEditModal} />
                     <div className={`gap-3 flex sm:justify-end`}>
-                        <Can action={'schedule.delete'}>
-                            <DeleteScheduleButton
-                                scheduleId={schedule.id}
-                                onDeleted={() => navigate(`/server/${id}/schedules`)}
-                            />
-                        </Can>
                         {schedule.tasks.length > 0 && (
                             <Can action={'schedule.update'}>
                                 <SpinnerOverlay visible={runLoading} size={'large'} />
-                                <ActionButton
-                                    variant='secondary'
+                                <Button
                                     className={'flex-1 sm:flex-none'}
                                     disabled={schedule.isProcessing}
                                     onClick={onTriggerExecute}
                                 >
                                     Run Now
-                                </ActionButton>
+                                </Button>
                             </Can>
                         )}
                     </div>
                     <TaskDetailsModal
                         schedule={schedule}
                         visible={showTaskModal}
-                        onModalDismissed={() => setShowTaskModal(false)}
+                        onDismissed={() => setShowTaskModal(false)}
                     />
                 </div>
             )}

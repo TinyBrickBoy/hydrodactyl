@@ -1,4 +1,4 @@
-import { CaptchaConfig, CaptchaProviderInterface, CaptchaRenderConfig } from './CaptchaProvider';
+import type { CaptchaConfig, CaptchaProviderInterface, CaptchaRenderConfig } from './CaptchaProvider';
 import { CaptchaProviderFactory } from './CaptchaProviderFactory';
 // Import types from the types file
 import './types';

@@ -1,11 +1,10 @@
 import { useLocation } from 'react-router-dom';
-
-import MessageBox from '@/components/MessageBox';
 import ConfigureTwoFactorForm from '@/components/dashboard/forms/ConfigureTwoFactorForm';
 import UpdateEmailAddressForm from '@/components/dashboard/forms/UpdateEmailAddressForm';
 import UpdatePasswordForm from '@/components/dashboard/forms/UpdatePasswordForm';
 import ContentBox from '@/components/elements/ContentBox';
 import PageContentBlock from '@/components/elements/PageContentBlock';
+import MessageBox from '@/components/MessageBox';
 
 import Code from '../elements/Code';
 
@@ -13,7 +12,7 @@ const AccountOverviewContainer = () => {
     const { state } = useLocation();
 
     return (
-        <PageContentBlock title={'Your Settings'}>
+        <PageContentBlock title={'Account Settings'}>
             <div className='w-full h-full min-h-full flex-1 flex flex-col px-2 sm:px-0'>
                 {state?.twoFactorRedirect && (
                     <div
@@ -30,7 +29,7 @@ const AccountOverviewContainer = () => {
                     </div>
                 )}
 
-                <div className='flex flex-col w-full h-full gap-4'>
+                <div className='flex flex-col w-full h-full gap-4 '>
                     <div
                         className='transform-gpu skeleton-anim-2'
                         style={{

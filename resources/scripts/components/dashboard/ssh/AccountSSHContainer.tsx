@@ -1,26 +1,23 @@
 import { Eye, EyeSlash, Key, Plus, TrashBin } from '@gravity-ui/icons';
 import { format } from 'date-fns';
-import { Actions, useStoreActions } from 'easy-peasy';
-import { Field, Form, Formik, FormikHelpers } from 'formik';
-import { useEffect, useState } from 'react';
+import { type Actions, useStoreActions } from 'easy-peasy';
+import { Field, Form, Formik, type FormikHelpers } from 'formik';
+import { useEffect, useMemo, useState } from 'react';
 import { object, string } from 'yup';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
-import Code from '@/components/elements/Code';
-import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
-import Input from '@/components/elements/Input';
-import { MainPageHeader } from '@/components/elements/MainPageHeader';
-import PageContentBlock from '@/components/elements/PageContentBlock';
-import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
-import { Dialog } from '@/components/elements/dialog';
-
 import { createSSHKey, deleteSSHKey, useSSHKeys } from '@/api/account/ssh-keys';
 import { httpErrorToHuman } from '@/api/http';
-
-import { ApplicationStore } from '@/state';
-
+import Code from '@/components/elements/Code';
+import CopyOnClick from '@/components/elements/CopyOnClick';
+import { Dialog } from '@/components/elements/dialog';
+import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
+import Input from '@/components/elements/Input';
+import PageContentBlock from '@/components/elements/PageContentBlock';
+import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import ServerHeader from '@/components/HeaderManger';
+import { Button } from '@/components/ui/button';
 import { useFlashKey } from '@/plugins/useFlash';
+import type { ApplicationStore } from '@/state';
 
 interface CreateValues {
     name: string;
@@ -28,7 +25,10 @@ interface CreateValues {
 }
 
 const AccountSSHContainer = () => {
-    const [deleteKey, setDeleteKey] = useState<{ name: string; fingerprint: string } | null>(null);
+    const [deleteKey, setDeleteKey] = useState<{
+        name: string;
+        fingerprint: string;
+    } | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
 
@@ -86,6 +86,7 @@ const AccountSSHContainer = () => {
     return (
         <PageContentBlock title={'SSH Keys'}>
             <FlashMessageRender byKey='account:ssh-keys' />
+            <ServerHeader title='SSH Keys' />
 
             {/* Create SSH Key Modal */}
             {showCreateModal && (
@@ -145,21 +146,7 @@ const AccountSSHContainer = () => {
                         animationTimingFunction:
                             'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                     }}
-                >
-                    <MainPageHeader
-                        title='SSH Keys'
-                        titleChildren={
-                            <ActionButton
-                                variant='primary'
-                                onClick={() => setShowCreateModal(true)}
-                                className='flex items-center gap-2'
-                            >
-                                <Plus width={22} height={22} fill='currentColor' />
-                                Add SSH Key
-                            </ActionButton>
-                        }
-                    />
-                </div>
+                ></div>
 
                 <div
                     className='transform-gpu skeleton-anim-2'
@@ -169,7 +156,7 @@ const AccountSSHContainer = () => {
                             'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                     }}
                 >
-                    <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-4 sm:p-6 shadow-sm'>
+                    <div className='rounded-xl p-6 md:p-4 shadow-sm'>
                         <SpinnerOverlay visible={!data && isValidating} />
                         <Dialog.Confirm
                             title={'Delete SSH Key'}
@@ -181,6 +168,16 @@ const AccountSSHContainer = () => {
                             Removing the <Code>{deleteKey?.name}</Code> SSH key will invalidate its usage across the
                             Panel.
                         </Dialog.Confirm>
+                        <div className='mb-4'>
+                            <Button
+                                variant='secondary'
+                                onClick={() => setShowCreateModal(true)}
+                                className='flex items-center gap-2'
+                            >
+                                <Plus width={22} height={22} fill='currentColor' />
+                                Add SSH Key
+                            </Button>
+                        </div>
 
                         {!data || data.length === 0 ? (
                             <div className='text-center py-12'>
@@ -206,7 +203,7 @@ const AccountSSHContainer = () => {
                                                 'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                                         }}
                                     >
-                                        <div className='bg-[#ffffff05] border-[1px] border-[#ffffff08] rounded-lg p-4 hover:border-[#ffffff15] transition-all duration-150'>
+                                        <div className='bg-mocha-500 border-mocha-300 border-[1px] rounded-lg transition-all duration-150 p-4'>
                                             <div className='flex items-center justify-between'>
                                                 <div className='flex-1 min-w-0'>
                                                     <div className='flex items-center gap-3 mb-2'>
@@ -218,40 +215,52 @@ const AccountSSHContainer = () => {
                                                         <span>Added: {format(key.createdAt, 'MMM d, yyyy HH:mm')}</span>
                                                         <div className='flex items-center gap-2'>
                                                             <span>Fingerprint:</span>
-                                                            <code className='font-mono px-2 py-1 bg-[#ffffff08] border border-[#ffffff08] rounded text-zinc-300'>
-                                                                {showKeys[key.fingerprint]
-                                                                    ? `SHA256:${key.fingerprint}`
-                                                                    : 'SHA256:••••••••••••••••'}
-                                                            </code>
-                                                            <ActionButton
-                                                                variant='secondary'
-                                                                size='sm'
-                                                                onClick={() => toggleKeyVisibility(key.fingerprint)}
-                                                                className='p-1 text-zinc-400 hover:text-zinc-300'
-                                                            >
+                                                            <code className='flex gap-1 font-mono px-2 py-1 bg-mocha-400 border border-mocha-200 rounded text-zinc-300'>
                                                                 {showKeys[key.fingerprint] ? (
                                                                     <EyeSlash
+                                                                        onClick={() =>
+                                                                            toggleKeyVisibility(key.fingerprint)
+                                                                        }
+                                                                        className='hover:cursor-pointer'
                                                                         width={18}
                                                                         height={18}
                                                                         fill='currentColor'
                                                                     />
                                                                 ) : (
-                                                                    <Eye width={18} height={18} fill='currentColor' />
+                                                                    <Eye
+                                                                        onClick={() =>
+                                                                            toggleKeyVisibility(key.fingerprint)
+                                                                        }
+                                                                        className='hover:cursor-pointer'
+                                                                        width={18}
+                                                                        height={18}
+                                                                        fill='currentColor'
+                                                                    />
                                                                 )}
-                                                            </ActionButton>
+                                                                {showKeys[key.fingerprint] ? (
+                                                                    <CopyOnClick text={key.fingerprint}>
+                                                                        <span>SHA256:${key.fingerprint}</span>
+                                                                    </CopyOnClick>
+                                                                ) : (
+                                                                    'SHA256:••••••••••••••••'
+                                                                )}
+                                                            </code>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <ActionButton
-                                                    variant='danger'
+                                                <Button
+                                                    variant='attention'
                                                     size='sm'
                                                     className='ml-4'
                                                     onClick={() =>
-                                                        setDeleteKey({ name: key.name, fingerprint: key.fingerprint })
+                                                        setDeleteKey({
+                                                            name: key.name,
+                                                            fingerprint: key.fingerprint,
+                                                        })
                                                     }
                                                 >
                                                     <TrashBin width={20} height={20} fill='currentColor' />
-                                                </ActionButton>
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>

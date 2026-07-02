@@ -1,4 +1,4 @@
-import { Action, action } from 'easy-peasy';
+import { type Action, action } from 'easy-peasy';
 
 export interface SiteSettings {
     name: string;

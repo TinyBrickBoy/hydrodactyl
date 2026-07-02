@@ -1,5 +1,5 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
+import React, { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 // ==================== TYPES ====================
@@ -178,13 +178,15 @@ export const ModrinthService = {
             });
 
             this.api.interceptors.response.use(undefined, async (error: AxiosError) => {
-                const config = error.config as AxiosRequestConfig & { _retryCount?: number };
+                const config = error.config as AxiosRequestConfig & {
+                    _retryCount?: number;
+                };
                 config._retryCount = config._retryCount || 0;
 
                 if (error.response?.status === 429 || error.response?.status >= 500) {
                     if (config._retryCount < MODRINTH_CONFIG.maxRetries) {
                         config._retryCount++;
-                        const delay = Math.pow(2, config._retryCount) * 1000;
+                        const delay = 2 ** config._retryCount * 1000;
                         await new Promise((resolve) => setTimeout(resolve, delay));
                         return this.api(config);
                     }
@@ -286,7 +288,9 @@ export const ModrinthService = {
             //    fullParams: params,
             //});
 
-            const response = await this.api.get('/search', { params: processedParams });
+            const response = await this.api.get('/search', {
+                params: processedParams,
+            });
 
             // console.log('Modrinth API Response:', {
             //     status: response.status,

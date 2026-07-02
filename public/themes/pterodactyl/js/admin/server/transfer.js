@@ -1,7 +1,9 @@
-$(document).ready(function () {
-    $('#pNodeId').select2({
-        placeholder: 'Select a Node',
-    }).change();
+$(document).ready(() => {
+    $('#pNodeId')
+        .select2({
+            placeholder: 'Select a Node',
+        })
+        .change();
 
     $('#pAllocation').select2({
         placeholder: 'Select a Default Allocation',
@@ -13,9 +15,9 @@ $(document).ready(function () {
 });
 
 $('#pNodeId').on('change', function () {
-    let currentNode = $(this).val();
+    const currentNode = $(this).val();
 
-    $.each(Pterodactyl.nodeData, function (i, v) {
+    $.each(Pterodactyl.nodeData, (i, v) => {
         if (v.id == currentNode) {
             $('#pAllocation').html('').select2({
                 data: v.allocations,
@@ -27,17 +29,17 @@ $('#pNodeId').on('change', function () {
     });
 });
 
-$('#pAllocation').on('change', function () {
+$('#pAllocation').on('change', () => {
     updateAdditionalAllocations();
 });
 
 function updateAdditionalAllocations() {
-    let currentAllocation = $('#pAllocation').val();
-    let currentNode = $('#pNodeId').val();
+    const currentAllocation = $('#pAllocation').val();
+    const currentNode = $('#pNodeId').val();
 
-    $.each(Pterodactyl.nodeData, function (i, v) {
+    $.each(Pterodactyl.nodeData, (i, v) => {
         if (v.id == currentNode) {
-            let allocations = [];
+            const allocations = [];
 
             for (let i = 0; i < v.allocations.length; i++) {
                 const allocation = v.allocations[i];

@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import { SettableModalProps } from '@/hoc/asModal';
+import type { SettableModalProps } from '@/hoc/asModal';
 
 export interface ModalContextValues {
     dismiss: () => void;

@@ -1,5 +1,5 @@
 import http from '@/api/http';
-import { Allocation } from '@/api/server/getServer';
+import type { Allocation } from '@/api/server/getServer';
 import { getGlobalDaemonType } from '@/api/server/getServer';
 
 export default async (uuid: string, id: number): Promise<Allocation> =>

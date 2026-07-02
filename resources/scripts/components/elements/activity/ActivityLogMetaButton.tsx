@@ -1,8 +1,7 @@
 import { Code, Copy } from '@gravity-ui/icons';
 import { useState } from 'react';
-
-import ActionButton from '@/components/elements/ActionButton';
 import { Dialog } from '@/components/elements/dialog';
+import { Button } from '@/components/ui/button';
 
 import { formatObjectToIdentString } from '@/lib/objects';
 
@@ -29,14 +28,14 @@ const ActivityLogMetaButton = ({ meta }: { meta: Record<string, unknown> }) => {
                 <div className='space-y-4'>
                     <div className='flex items-center justify-between'>
                         <h4 className='text-sm font-medium text-zinc-300'>Formatted View</h4>
-                        <ActionButton
+                        <Button
                             variant='secondary'
                             onClick={copyToClipboard}
                             className='flex items-center gap-2 text-xs'
                         >
                             <Copy width={22} height={22} />
                             {copied ? 'Copied!' : 'Copy JSON'}
-                        </ActionButton>
+                        </Button>
                     </div>
 
                     <div className='bg-zinc-900 rounded-lg p-4 border border-zinc-800 max-h-96 overflow-auto'>
@@ -56,9 +55,9 @@ const ActivityLogMetaButton = ({ meta }: { meta: Record<string, unknown> }) => {
                 </div>
 
                 <Dialog.Footer>
-                    <ActionButton variant='secondary' onClick={() => setOpen(false)}>
+                    <Button variant='secondary' onClick={() => setOpen(false)}>
                         Close
-                    </ActionButton>
+                    </Button>
                 </Dialog.Footer>
             </Dialog>
 

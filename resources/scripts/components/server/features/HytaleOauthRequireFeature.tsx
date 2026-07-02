@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import Button from '@/components/elements/ActionButton';
 // assuming this is your styled button
 import Modal from '@/components/elements/Modal';
+import FlashMessageRender from '@/components/FlashMessageRender';
 import { SocketEvent } from '@/components/server/events';
-
-import { ServerContext } from '@/state/server';
-
+import { Button } from '@/components/ui/button';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 const HytaleOauthRequireFeature = () => {
     const [visible, setVisible] = useState(false);
@@ -73,7 +70,6 @@ const HytaleOauthRequireFeature = () => {
                 </div>
 
                 <Button
-                    variant='primary'
                     onClick={handleAuthenticate}
                     className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded mb-6 flex items-center justify-center gap-2'
                 >

@@ -1,10 +1,9 @@
 import { Xmark } from '@gravity-ui/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { useContext, useEffect, useState } from 'react';
-
-import ActionButton from '@/components/elements/ActionButton';
 import Code from '@/components/elements/Code';
 import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
+import { Button } from '@/components/ui/button';
 
 import asDialog from '@/hoc/asDialog';
 
@@ -77,14 +76,14 @@ const FileUploadList = () => {
                         <Code className={'flex-1 truncate'}>{name}</Code>
                         <Tooltip.Root delayDuration={200}>
                             <Tooltip.Trigger asChild>
-                                <ActionButton
+                                <Button
                                     variant='secondary'
                                     size='sm'
                                     onClick={cancelFileUpload.bind(this, name)}
                                     className='hover:!text-red-400'
                                 >
                                     <Xmark />
-                                </ActionButton>
+                                </Button>
                             </Tooltip.Trigger>
                             <Tooltip.Portal>
                                 <Tooltip.Content
@@ -100,12 +99,12 @@ const FileUploadList = () => {
                     </div>
                 ))}
                 <Dialog.Footer>
-                    <ActionButton variant='danger' onClick={() => clearFileUploads()}>
+                    <Button variant='destructive' onClick={() => clearFileUploads()}>
                         Cancel Uploads
-                    </ActionButton>
-                    <ActionButton variant='secondary' onClick={close}>
+                    </Button>
+                    <Button variant='secondary' onClick={close}>
                         Close
-                    </ActionButton>
+                    </Button>
                 </Dialog.Footer>
             </div>
         </Tooltip.Provider>
@@ -134,7 +133,7 @@ const FileManagerStatus = () => {
                 {count > 0 && (
                     <Tooltip.Root delayDuration={200}>
                         <Tooltip.Trigger asChild>
-                            <ActionButton
+                            <Button
                                 variant='secondary'
                                 size='sm'
                                 className='w-10 h-10 p-0'
@@ -162,7 +161,7 @@ const FileManagerStatus = () => {
                                         d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
                                     ></path>
                                 </svg>
-                            </ActionButton>
+                            </Button>
                         </Tooltip.Trigger>
                         <Tooltip.Portal>
                             <Tooltip.Content

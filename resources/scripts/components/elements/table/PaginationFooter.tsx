@@ -1,9 +1,7 @@
 import { ChevronLeft, ChevronRight } from '@gravity-ui/icons';
 import clsx from 'clsx';
-
-import ActionButton from '@/components/elements/ActionButton';
-
-import { PaginationDataSet } from '@/api/http';
+import type { PaginationDataSet } from '@/api/http';
+import { Button } from '@/components/ui/button';
 
 interface Props {
     className?: string;
@@ -42,7 +40,7 @@ const PaginationFooter = ({ pagination, className, onPageSelect }: Props) => {
             </p>
             {pagination.totalPages > 1 && (
                 <div className={'flex space-x-1'}>
-                    <ActionButton
+                    <Button
                         variant='secondary'
                         size='sm'
                         onClick={() => onPageSelect(current - 1)}
@@ -50,9 +48,9 @@ const PaginationFooter = ({ pagination, className, onPageSelect }: Props) => {
                         className=' p-0 flex items-center justify-center'
                     >
                         <ChevronLeft width={22} height={22} fill='currentColor' />
-                    </ActionButton>
+                    </Button>
                     {pages.previous.reverse().map((value) => (
-                        <ActionButton
+                        <Button
                             key={`previous-${value}`}
                             variant='secondary'
                             size='sm'
@@ -60,18 +58,13 @@ const PaginationFooter = ({ pagination, className, onPageSelect }: Props) => {
                             className='w-8 h-8 p-0 flex items-center justify-center'
                         >
                             {value}
-                        </ActionButton>
+                        </Button>
                     ))}
-                    <ActionButton
-                        variant='primary'
-                        size='sm'
-                        className='w-8 h-8 p-0 flex items-center justify-center'
-                        disabled
-                    >
+                    <Button size='sm' className='w-8 h-8 p-0 flex items-center justify-center' disabled>
                         {current}
-                    </ActionButton>
+                    </Button>
                     {pages.next.map((value) => (
-                        <ActionButton
+                        <Button
                             key={`next-${value}`}
                             variant='secondary'
                             size='sm'
@@ -79,9 +72,9 @@ const PaginationFooter = ({ pagination, className, onPageSelect }: Props) => {
                             className='w-8 h-8 p-0 flex items-center justify-center'
                         >
                             {value}
-                        </ActionButton>
+                        </Button>
                     ))}
-                    <ActionButton
+                    <Button
                         variant='secondary'
                         size='sm'
                         onClick={() => onPageSelect(current + 1)}
@@ -89,7 +82,7 @@ const PaginationFooter = ({ pagination, className, onPageSelect }: Props) => {
                         className='p-0 flex items-center justify-center'
                     >
                         <ChevronRight width={22} height={22} fill='currentColor' />
-                    </ActionButton>
+                    </Button>
                 </div>
             )}
         </div>

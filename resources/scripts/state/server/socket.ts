@@ -1,6 +1,6 @@
-import { Action, action } from 'easy-peasy';
+import { type Action, action } from 'easy-peasy';
 
-import { Websocket } from '@/plugins/Websocket';
+import type { Websocket } from '@/plugins/Websocket';
 
 export interface SocketStore {
     instance: Websocket | null;

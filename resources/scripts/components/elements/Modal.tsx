@@ -3,10 +3,9 @@ import { Dialog as HDialog } from '@headlessui/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-
-import ActionButton from '@/components/elements/ActionButton';
+import { DialogContext, type IconPosition, styles } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
-import { DialogContext, IconPosition, styles } from '@/components/elements/dialog';
+import { Button } from '@/components/ui/button';
 
 const variants = {
     open: {
@@ -52,13 +51,13 @@ export interface ModalProps extends RequiredModalProps {
 }
 
 export const ModalMask = styled.div`
-    background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.94) 100%);
-    position: fixed;
-    z-index: 9997;
-    overflow: auto;
-    flex: 1;
-    inset: 0;
-    backdrop-filter: blur(3px);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.94) 100%);
+  position: fixed;
+  z-index: 9997;
+  overflow: auto;
+  flex: 1;
+  inset: 0;
+  backdrop-filter: blur(3px);
 `;
 
 const Modal: React.FC<ModalProps> = ({
@@ -163,9 +162,13 @@ const Modal: React.FC<ModalProps> = ({
                                                 </div>
                                                 {closeButton && (
                                                     <div className={`my-6 sm:flex items-center justify-end`}>
-                                                        <ActionButton onClick={onDismissed} className={`min-w-full`}>
-                                                            <div>Close</div>
-                                                        </ActionButton>
+                                                        <Button
+                                                            variant='default'
+                                                            onClick={onDismissed}
+                                                            className={`min-w-full`}
+                                                        >
+                                                            Close
+                                                        </Button>
                                                     </div>
                                                 )}
                                             </div>

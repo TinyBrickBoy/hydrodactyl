@@ -1,12 +1,9 @@
 import { useCallback, useContext } from 'react';
-
 import { getGlobalDaemonType } from '@/api/server/getServer';
 import getServerBackups from '@/api/swr/getServerBackups';
-
 import { ServerContext } from '@/state/server';
-
 import { LiveProgressContext } from './BackupContainer';
-import { UnifiedBackup } from './BackupItem';
+import type { UnifiedBackup } from './types';
 
 export const useUnifiedBackups = () => {
     const { data: backups, error, isValidating, mutate } = getServerBackups();
@@ -18,7 +15,11 @@ export const useUnifiedBackups = () => {
     const createBackup = useCallback(
         async (name: string, ignored: string, isLocked: boolean) => {
             const { default: createServerBackup } = await import('@/api/server/backups/createServerBackup');
-            const result = await createServerBackup(uuid, { name, ignored, isLocked });
+            const result = await createServerBackup(uuid, {
+                name,
+                ignored,
+                isLocked,
+            });
             mutate();
             return result;
         },
@@ -62,7 +63,7 @@ export const useUnifiedBackups = () => {
             });
             mutate();
         },
-        [uuid, mutate],
+        [uuid, mutate, daemonType],
     );
 
     const toggleBackupLock = useCallback(
@@ -71,7 +72,7 @@ export const useUnifiedBackups = () => {
             await http.post(`/api/client/servers/${daemonType}/${uuid}/backups/${backupUuid}/lock`);
             mutate();
         },
-        [uuid, mutate],
+        [uuid, mutate, daemonType],
     );
 
     const unifiedBackups: UnifiedBackup[] = [];

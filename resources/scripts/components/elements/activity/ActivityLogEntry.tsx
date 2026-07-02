@@ -1,4 +1,4 @@
-import { ActivityLog } from '@definitions/user';
+import type { ActivityLog } from '@definitions/user';
 import { TerminalLine } from '@gravity-ui/icons';
 // FIXME: add icons back
 import clsx from 'clsx';

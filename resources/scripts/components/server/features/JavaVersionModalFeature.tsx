@@ -1,8 +1,7 @@
 import { ChevronDown, ChevronUp } from '@gravity-ui/icons';
 import { useEffect, useState } from 'react';
-
-import ActionButton from '@/components/elements/ActionButton';
-// import { Options } from '@/components/elements/button/types';
+import setSelectedDockerImage from '@/api/server/setSelectedDockerImage';
+import getServerStartup from '@/api/swr/getServerStartup';
 import Can from '@/components/elements/Can';
 import {
     DropdownMenu,
@@ -14,14 +13,10 @@ import {
 import Modal from '@/components/elements/Modal';
 import Spinner from '@/components/elements/Spinner';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
-
-import setSelectedDockerImage from '@/api/server/setSelectedDockerImage';
-import getServerStartup from '@/api/swr/getServerStartup';
-
-import { ServerContext } from '@/state/server';
-
+import { Button } from '@/components/ui/button';
 import useFlash from '@/plugins/useFlash';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
+import { ServerContext } from '@/state/server';
 
 // FIXME: use regex
 const MATCH_ERRORS = [
@@ -44,7 +39,9 @@ const JavaVersionModalFeature = () => {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const { instance } = ServerContext.useStoreState((state) => state.socket);
 
-    const { data, isValidating, mutate } = getServerStartup(uuid, undefined, { revalidateOnMount: false });
+    const { data, isValidating, mutate } = getServerStartup(uuid, undefined, {
+        revalidateOnMount: false,
+    });
 
     useEffect(() => {
         if (!visible) return;
@@ -130,12 +127,12 @@ const JavaVersionModalFeature = () => {
                         </DropdownMenu>
                     </Can>
                     {/* <Button variant={Options.Variant.Secondary} onClick={() => setVisible(false)}>
-                        Cancel
-                    </Button> */}
+            Cancel
+          </Button> */}
                     <Can action={'startup.docker-image'}>
-                        <ActionButton variant='primary' onClick={updateJava} className={`w-full sm:w-auto`}>
+                        <Button variant='attention' onClick={updateJava} className={`w-full sm:w-auto`}>
                             Update
-                        </ActionButton>
+                        </Button>
                     </Can>
                 </div>
             </div>

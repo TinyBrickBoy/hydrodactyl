@@ -110,7 +110,7 @@
           </li>
           <li class="{{ !starts_with(Route::currentRouteName(), 'admin.buckets') ?: 'active' }}">
             <a href="{{ route('admin.buckets') }}">
-              <i class="bi bi-cloud-fill"></i> <span>S3 Buckets</span>
+              <i class="bi bi-bucket-fill"></i> <span>S3 Buckets</span>
             </a>
           </li>
           <li class="{{ !starts_with(Route::currentRouteName(), 'admin.locations') ?: 'active' }}">

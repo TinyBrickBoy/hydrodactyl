@@ -1,20 +1,17 @@
-import { Actions, useStoreActions } from 'easy-peasy';
-import { Field, Form, Formik, FormikHelpers } from 'formik';
+import { type Actions, useStoreActions } from 'easy-peasy';
+import { Field, Form, Formik, type FormikHelpers } from 'formik';
 import { useState } from 'react';
 import { object, string } from 'yup';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import { createSSHKey, useSSHKeys } from '@/api/account/ssh-keys';
+import { httpErrorToHuman } from '@/api/http';
 import ContentBox from '@/components/elements/ContentBox';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import Input from '@/components/elements/Input';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import { Button } from '@/components/ui/button';
 
-import { createSSHKey } from '@/api/account/ssh-keys';
-import { useSSHKeys } from '@/api/account/ssh-keys';
-import { httpErrorToHuman } from '@/api/http';
-
-import { ApplicationStore } from '@/state';
+import type { ApplicationStore } from '@/state';
 
 interface Values {
     name: string;
@@ -85,9 +82,9 @@ const CreateSSHKeyForm = () => {
 
                             {/* Submit Button below form fields */}
                             <div className='flex justify-end mt-6'>
-                                <ActionButton type='submit' disabled={isSubmitting}>
+                                <Button type='submit' disabled={isSubmitting}>
                                     {isSubmitting ? 'Creating...' : 'Create SSH Key'}
-                                </ActionButton>
+                                </Button>
                             </div>
                         </Form>
                     )}

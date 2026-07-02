@@ -1,39 +1,33 @@
-import ModalContext from '@/context/ModalContext';
-import { Form, Formik, Field as FormikField, FormikHelpers, useField } from 'formik';
-import { useContext, useEffect } from 'react';
+import { Form, Formik, Field as FormikField, type FormikHelpers, useField } from 'formik';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import { boolean, number, object, string } from 'yup';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import { httpErrorToHuman } from '@/api/http';
+import createOrUpdateScheduleTask from '@/api/server/schedules/createOrUpdateScheduleTask';
+import type { Schedule, Task } from '@/api/server/schedules/getServerSchedules';
 import Field from '@/components/elements/Field';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import FormikSwitchV2 from '@/components/elements/FormikSwitchV2';
 import { Textarea } from '@/components/elements/Input';
+import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import Select from '@/components/elements/Select';
-
-import asModal from '@/hoc/asModal';
-
-import { httpErrorToHuman } from '@/api/http';
-import createOrUpdateScheduleTask from '@/api/server/schedules/createOrUpdateScheduleTask';
-import { Schedule, Task } from '@/api/server/schedules/getServerSchedules';
-
-import { ServerContext } from '@/state/server';
-
+import FlashMessageRender from '@/components/FlashMessageRender';
+import { Button } from '@/components/ui/button';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 // TODO: Port modern dropdowns to Formik and integrate them
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem } from '@/components/elements/DropdownMenu';
 // import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 
 const Label = styled.label`
-    display: inline-block;
-    color: #ffffff77;
-    font-size: 0.875rem;
-    padding-bottom: 0.5rem;
+  display: inline-block;
+  color: #ffffff77;
+  font-size: 0.875rem;
+  padding-bottom: 0.5rem;
 `;
 
-interface Props {
+interface Props extends RequiredModalProps {
     schedule: Schedule;
     // If a task is provided we can assume we're editing it. If not provided,
     // we are creating a new one.
@@ -79,8 +73,7 @@ const ActionListener = () => {
     return null;
 };
 
-const TaskDetailsModal = ({ schedule, task }: Props) => {
-    const { dismiss, setPropOverrides } = useContext(ModalContext);
+const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Props) => {
     const { clearFlashes, addError } = useFlash();
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
@@ -88,14 +81,8 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
     const backupLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backups);
 
     useEffect(() => {
-        return () => {
-            clearFlashes('schedule:task');
-        };
-    }, []);
-
-    useEffect(() => {
-        setPropOverrides({ title: task ? 'Edit Task' : 'Create Task' });
-    }, []);
+        clearFlashes('schedule:task');
+    }, [clearFlashes]);
 
     const submit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         clearFlashes('schedule:task');
@@ -114,7 +101,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
                     }
 
                     appendSchedule({ ...schedule, tasks });
-                    dismiss();
+                    onDismissed();
                 })
                 .catch((error) => {
                     console.error(error);
@@ -125,18 +112,24 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
     };
 
     return (
-        <div className='min-w-full'>
-            <Formik
-                onSubmit={submit}
-                validationSchema={schema}
-                initialValues={{
-                    action: task?.action || 'command',
-                    payload: task?.payload || '',
-                    timeOffset: task?.timeOffset.toString() || '0',
-                    continueOnFailure: task?.continueOnFailure || false,
-                }}
-            >
-                {({ isSubmitting, values }) => (
+        <Formik
+            onSubmit={submit}
+            validationSchema={schema}
+            initialValues={{
+                action: task?.action || 'command',
+                payload: task?.payload || '',
+                timeOffset: task?.timeOffset.toString() || '0',
+                continueOnFailure: task?.continueOnFailure || false,
+            }}
+        >
+            {({ isSubmitting, values }) => (
+                <Modal
+                    visible={visible}
+                    onDismissed={onDismissed}
+                    {...props}
+                    showSpinnerOverlay={isSubmitting}
+                    title={task ? 'Edit Task' : 'Create Task'}
+                >
                     <Form>
                         <FlashMessageRender byKey={'schedule:task'} />
                         <div className={`flex flex-col gap-3`}>
@@ -214,7 +207,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
                                     <FormikFieldWrapper
                                         name={'payload'}
                                         description={
-                                            'Include the files and folders to be excluded in this backup. By default, the contents of your .pteroignore file will be used. If you have reached your backup limit, the oldest backup will be rotated.'
+                                            'Include the files and folders to be excluded in this backup. By default, the contents of your .pyroignore file will be used. If you have reached your backup limit, the oldest backup will be rotated.'
                                         }
                                     >
                                         <FormikField
@@ -233,15 +226,15 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
                             label={'Continue on Failure'}
                         />
                         <div className={`flex justify-end my-6`}>
-                            <ActionButton variant='primary' type={'submit'} disabled={isSubmitting}>
+                            <Button variant='attention' type={'submit'} disabled={isSubmitting}>
                                 {task ? 'Save Changes' : 'Create Task'}
-                            </ActionButton>
+                            </Button>
                         </div>
                     </Form>
-                )}
-            </Formik>
-        </div>
+                </Modal>
+            )}
+        </Formik>
     );
 };
 
-export default asModal<Props>()(TaskDetailsModal);
+export default TaskDetailsModal;

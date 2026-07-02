@@ -1,16 +1,14 @@
 import { TrashBin } from '@gravity-ui/icons';
-import { Actions, useStoreActions } from 'easy-peasy';
+import { type Actions, useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
-
-import ActionButton from '@/components/elements/ActionButton';
-import ConfirmationModal from '@/components/elements/ConfirmationModal';
-
 import { httpErrorToHuman } from '@/api/http';
 import deleteSubuser from '@/api/server/users/deleteSubuser';
+import ConfirmationModal from '@/components/elements/ConfirmationModal';
+import { Button } from '@/components/ui/button';
 
-import { ApplicationStore } from '@/state';
+import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
-import { Subuser } from '@/state/server/subusers';
+import type { Subuser } from '@/state/server/subusers';
 
 const RemoveSubuserButton = ({ subuser }: { subuser: Subuser }) => {
     const [loading, setLoading] = useState(false);
@@ -48,16 +46,15 @@ const RemoveSubuserButton = ({ subuser }: { subuser: Subuser }) => {
             >
                 All access to the server will be removed immediately.
             </ConfirmationModal>
-            <ActionButton
-                variant='danger'
+            <Button
+                variant='attention'
                 size='sm'
-                className='flex items-center gap-2'
+                className='p-2'
                 onClick={() => setShowConfirmation(true)}
-                aria-label='Delete subuser'
+                title='Delete subuser'
             >
-                <TrashBin width={22} height={22} fill='currentColor' className='w-4 h-4' />
-                Delete
-            </ActionButton>
+                <TrashBin width={22} height={22} fill='currentColor' />
+            </Button>
         </>
     );
 };

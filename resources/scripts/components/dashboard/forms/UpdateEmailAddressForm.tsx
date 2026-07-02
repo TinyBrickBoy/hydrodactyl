@@ -1,15 +1,13 @@
-import { Actions, State, useStoreActions, useStoreState } from 'easy-peasy';
-import { Form, Formik, FormikHelpers } from 'formik';
+import { type Actions, type State, useStoreActions, useStoreState } from 'easy-peasy';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { Fragment } from 'react';
 import * as Yup from 'yup';
-
-import ActionButton from '@/components/elements/ActionButton';
+import { httpErrorToHuman } from '@/api/http';
 import Field from '@/components/elements/Field';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import { Button } from '@/components/ui/button';
 
-import { httpErrorToHuman } from '@/api/http';
-
-import { ApplicationStore } from '@/state';
+import type { ApplicationStore } from '@/state';
 
 interface Values {
     email: string;
@@ -63,9 +61,9 @@ const UpdateEmailAddressForm = () => {
                             <Field id={'confirm_password'} type={'password'} name={'password'} label={'Password'} />
                         </div>
                         <div className={`mt-6`}>
-                            <ActionButton variant='primary' disabled={isSubmitting || !isValid}>
+                            <Button variant='secondary' disabled={isSubmitting || !isValid}>
                                 Update Email
-                            </ActionButton>
+                            </Button>
                         </div>
                     </Form>
                 </Fragment>

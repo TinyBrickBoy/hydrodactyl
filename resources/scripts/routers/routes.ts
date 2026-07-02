@@ -18,16 +18,16 @@ import AccountApiContainer from '@/components/dashboard/AccountApiContainer';
 import AccountOverviewContainer from '@/components/dashboard/AccountOverviewContainer';
 import ActivityLogContainer from '@/components/dashboard/activity/ActivityLogContainer';
 import AccountSSHContainer from '@/components/dashboard/ssh/AccountSSHContainer';
-import ServerActivityLogContainer from '@/components/server/ServerActivityLogContainer';
 import BackupContainer from '@/components/server/backups/BackupContainer';
 import ServerConsoleContainer from '@/components/server/console/ServerConsoleContainer';
 import DatabasesContainer from '@/components/server/databases/DatabasesContainer';
 import FileManagerContainer from '@/components/server/files/FileManagerContainer';
 import ModrinthContainer from '@/components/server/modrinth/ModrinthContainer';
 import NetworkContainer from '@/components/server/network/NetworkContainer';
+import ServerActivityLogContainer from '@/components/server/ServerActivityLogContainer';
 import ScheduleContainer from '@/components/server/schedules/ScheduleContainer';
 import SettingsContainer from '@/components/server/settings/SettingsContainer';
-import ShellContainer from '@/components/server/shell/ShellContainer';
+import SoftwareContainer from '@/components/server/software/SoftwareContainer';
 import StartupContainer from '@/components/server/startup/StartupContainer';
 import CreateUserContainer from '@/components/server/users/CreateUserContainer';
 import EditUserContainer from '@/components/server/users/EditUserContainer';
@@ -249,7 +249,7 @@ const routes: Routes = {
             path: 'shell',
             permission: 'startup.software',
             name: 'Software',
-            component: ShellContainer,
+            component: SoftwareContainer,
             icon: Box,
             end: true,
         },

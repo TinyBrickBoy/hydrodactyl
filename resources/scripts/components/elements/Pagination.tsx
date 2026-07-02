@@ -1,9 +1,7 @@
 import { ArrowLeft, ArrowRight } from '@gravity-ui/icons';
 import styled from 'styled-components';
-
+import type { PaginatedResult } from '@/api/http';
 import Button from '@/components/elements/Button';
-
-import { PaginatedResult } from '@/api/http';
 
 interface RenderFuncProps<T> {
     items: T[];

@@ -2,7 +2,7 @@ import type { AxiosError } from 'axios';
 import type { SWRConfiguration } from 'swr';
 import useSWR from 'swr';
 
-import http, { FractalResponseList } from '@/api/http';
+import http, { type FractalResponseList } from '@/api/http';
 import { getGlobalDaemonType } from '@/api/server/getServer';
 import type { ServerEggVariable } from '@/api/server/types';
 import { rawDataToServerEggVariable } from '@/api/transformers';

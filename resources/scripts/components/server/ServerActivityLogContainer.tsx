@@ -1,18 +1,18 @@
 import { ArrowDownToLine, ClockArrowRotateLeft, Funnel, Magnifier, Xmark } from '@gravity-ui/icons';
 import { useEffect, useMemo, useState } from 'react';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import type { ActivityLogFilters } from '@/api/account/activity';
+import { useActivityLogs } from '@/api/server/activity';
+import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
+import ErrorBoundary from '@/components/elements/ErrorBoundary';
+import { Input } from '@/components/elements/inputs';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Select from '@/components/elements/Select';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
-import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
-import { Input } from '@/components/elements/inputs';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
-
-import { ActivityLogFilters } from '@/api/account/activity';
-import { useActivityLogs } from '@/api/server/activity';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import ServerHeader from '@/components/server/header/ServerHeader';
+import { Button } from '@/components/ui/button';
 
 import { useFlashKey } from '@/plugins/useFlash';
 import useLocationHash from '@/plugins/useLocationHash';
@@ -20,7 +20,10 @@ import useLocationHash from '@/plugins/useLocationHash';
 const ServerActivityLogContainer = () => {
     const { hash } = useLocationHash();
     const { clearAndAddHttpError } = useFlashKey('server:activity');
-    const [filters, setFilters] = useState<ActivityLogFilters>({ page: 1, sorts: { timestamp: -1 } });
+    const [filters, setFilters] = useState<ActivityLogFilters>({
+        page: 1,
+        sorts: { timestamp: -1 },
+    });
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedEventType, setSelectedEventType] = useState('');
     const [showFilters, setShowFilters] = useState(false);
@@ -143,7 +146,10 @@ const ServerActivityLogContainer = () => {
     }, [showFilters]);
 
     useEffect(() => {
-        setFilters((value) => ({ ...value, filters: { ip: hash.ip, event: hash.event } }));
+        setFilters((value) => ({
+            ...value,
+            filters: { ip: hash.ip, event: hash.event },
+        }));
     }, [hash]);
 
     useEffect(() => {
@@ -151,58 +157,185 @@ const ServerActivityLogContainer = () => {
     }, [error]);
 
     return (
-        <ServerContentBlock title={'Activity Log'}>
+        <ServerContentBlock title={'Activity Log'} showFlashKey={'activity'}>
+            <ServerHeader />
             <div className='w-full h-full min-h-full flex-1 flex flex-col px-2 sm:px-0'>
                 <FlashMessageRender byKey={'server:activity'} />
 
-                <div
-                    className='transform-gpu skeleton-anim-2 mb-3 sm:mb-4'
-                    style={{
-                        animationDelay: '75ms',
-                        animationTimingFunction:
-                            'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
-                    }}
-                >
-                    <MainPageHeader
-                        direction='column'
-                        title={'Activity Log'}
-                        titleChildren={
-                            <div className='flex gap-2 items-center flex-wrap'>
-                                <ActionButton
-                                    variant='secondary'
-                                    onClick={() => setShowFilters(!showFilters)}
-                                    className='flex items-center gap-2'
-                                    title='Toggle Filters (Ctrl+F)'
-                                >
-                                    <Funnel width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                    Filters
-                                    {hasActiveFilters && <span className='w-2 h-2 bg-brand rounded-full'></span>}
-                                </ActionButton>
-                                <ActionButton
-                                    variant='secondary'
-                                    onClick={exportLogs}
-                                    disabled={!filteredData?.items?.length}
-                                    className='flex items-center gap-2'
-                                    title='Export CSV (Ctrl+E)'
-                                >
-                                    <ArrowDownToLine width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                    Export
-                                </ActionButton>
-                            </div>
-                        }
-                    >
-                        <p className='text-sm text-neutral-400 leading-relaxed'>
-                            Monitor all server activity and track user actions. Filter events, search for specific
-                            activities, and export logs for audit purposes.
-                        </p>
-                    </MainPageHeader>
-                </div>
-
-                {showFilters && (
+                <ErrorBoundary>
                     <div
                         className='transform-gpu skeleton-anim-2 mb-3 sm:mb-4'
                         style={{
-                            animationDelay: '100ms',
+                            animationDelay: '75ms',
+                            animationTimingFunction:
+                                'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
+                        }}
+                    >
+                        <MainPageHeader
+                            direction='column'
+                            title={'Activity Log'}
+                            titleChildren={
+                                <div className='flex gap-2 items-center flex-wrap'>
+                                    <Button
+                                        variant='secondary'
+                                        onClick={() => setShowFilters(!showFilters)}
+                                        className='flex items-center gap-2'
+                                        title='Toggle Filters (Ctrl+F)'
+                                    >
+                                        <Funnel width={22} height={22} className='w-4 h-4' fill='currentColor' />
+                                        Filters
+                                        {hasActiveFilters && <span className='w-2 h-2 bg-brand rounded-full'></span>}
+                                    </Button>
+                                    <Button
+                                        variant='secondary'
+                                        onClick={exportLogs}
+                                        disabled={!filteredData?.items?.length}
+                                        className='flex items-center gap-2'
+                                        title='Export CSV (Ctrl+E)'
+                                    >
+                                        <ArrowDownToLine
+                                            width={22}
+                                            height={22}
+                                            className='w-4 h-4'
+                                            fill='currentColor'
+                                        />
+                                        Export
+                                    </Button>
+                                </div>
+                            }
+                        >
+                            <p className='text-sm text-neutral-400 leading-relaxed'>
+                                Monitor all server activity and track user actions. Filter events, search for specific
+                                activities, and export logs for audit purposes.
+                            </p>
+                        </MainPageHeader>
+                    </div>
+                </ErrorBoundary>
+
+                <ErrorBoundary>
+                    {showFilters && (
+                        <div
+                            className='transform-gpu skeleton-anim-2 mb-3 sm:mb-4'
+                            style={{
+                                animationDelay: '100ms',
+                                animationTimingFunction:
+                                    'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
+                            }}
+                        >
+                            <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-4 hover:border-[#ffffff20] transition-all duration-150 shadow-sm'>
+                                <div className='flex items-center gap-2 mb-4'>
+                                    <div className='w-5 h-5 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
+                                        <Funnel
+                                            width={22}
+                                            height={22}
+                                            className='w-2.5 h-2.5 text-zinc-400'
+                                            fill='currentColor'
+                                        />
+                                    </div>
+                                    <h3 className='text-base font-semibold text-zinc-100'>Filters</h3>
+                                </div>
+
+                                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                                    <div>
+                                        <label className='block text-sm font-medium text-zinc-300 mb-2'>Search</label>
+                                        <div className='relative'>
+                                            <Magnifier
+                                                width={22}
+                                                height={22}
+                                                className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none z-10'
+                                                fill='currentColor'
+                                            />
+                                            <Input.Text
+                                                type='text'
+                                                placeholder='Search events, IPs, users...'
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                style={{ paddingLeft: '2.5rem' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className='block text-sm font-medium text-zinc-300 mb-2'>
+                                            Event Type
+                                        </label>
+                                        <Select
+                                            value={selectedEventType}
+                                            onChange={(e) => setSelectedEventType(e.target.value)}
+                                            className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-brand focus:ring-1 focus:ring-brand hover:border-zinc-500 transition-colors duration-150'
+                                        >
+                                            <option value='' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
+                                                All Events
+                                            </option>
+                                            {eventTypes.map((type) => (
+                                                <option
+                                                    key={type}
+                                                    value={type}
+                                                    style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
+                                                >
+                                                    {type}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </div>
+
+                                    <div>
+                                        <label className='block text-sm font-medium text-zinc-300 mb-2'>
+                                            Time Range
+                                        </label>
+                                        <Select
+                                            value={dateRange}
+                                            onChange={(e) => setDateRange(e.target.value)}
+                                            className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-brand focus:ring-1 focus:ring-brand hover:border-zinc-500 transition-colors duration-150'
+                                        >
+                                            <option
+                                                value='all'
+                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
+                                            >
+                                                All Time
+                                            </option>
+                                            <option value='1h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
+                                                Last Hour
+                                            </option>
+                                            <option
+                                                value='24h'
+                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
+                                            >
+                                                Last 24 Hours
+                                            </option>
+                                            <option value='7d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
+                                                Last 7 Days
+                                            </option>
+                                            <option
+                                                value='30d'
+                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
+                                            >
+                                                Last 30 Days
+                                            </option>
+                                        </Select>
+                                    </div>
+
+                                    <div className='flex items-end'>
+                                        {hasActiveFilters && (
+                                            <Button
+                                                variant='secondary'
+                                                onClick={clearAllFilters}
+                                                className='flex items-center gap-2 w-full'
+                                            >
+                                                <Xmark width={22} height={22} className='w-4 h-4' fill='currentColor' />
+                                                Clear All Filters
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div
+                        className='transform-gpu skeleton-anim-2'
+                        style={{
+                            animationDelay: '125ms',
                             animationTimingFunction:
                                 'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                         }}
@@ -210,169 +343,66 @@ const ServerActivityLogContainer = () => {
                         <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-4 hover:border-[#ffffff20] transition-all duration-150 shadow-sm'>
                             <div className='flex items-center gap-2 mb-4'>
                                 <div className='w-5 h-5 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
-                                    <Funnel
+                                    <ClockArrowRotateLeft
                                         width={22}
                                         height={22}
-                                        className='w-2.5 h-2.5 text-zinc-400'
+                                        className=' text-zinc-400'
                                         fill='currentColor'
                                     />
                                 </div>
-                                <h3 className='text-base font-semibold text-zinc-100'>Filters</h3>
-                            </div>
-
-                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                                <div>
-                                    <label className='block text-sm font-medium text-zinc-300 mb-2'>Search</label>
-                                    <div className='relative'>
-                                        <Magnifier
-                                            width={22}
-                                            height={22}
-                                            className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none z-10'
-                                            fill='currentColor'
-                                        />
-                                        <Input.Text
-                                            type='text'
-                                            placeholder='Search events, IPs, users...'
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            style={{ paddingLeft: '2.5rem' }}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className='block text-sm font-medium text-zinc-300 mb-2'>Event Type</label>
-                                    <Select
-                                        value={selectedEventType}
-                                        onChange={(e) => setSelectedEventType(e.target.value)}
-                                        className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-brand focus:ring-1 focus:ring-brand hover:border-zinc-500 transition-colors duration-150'
-                                    >
-                                        <option value='' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            All Events
-                                        </option>
-                                        {eventTypes.map((type) => (
-                                            <option
-                                                key={type}
-                                                value={type}
-                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
-                                            >
-                                                {type}
-                                            </option>
-                                        ))}
-                                    </Select>
-                                </div>
-
-                                <div>
-                                    <label className='block text-sm font-medium text-zinc-300 mb-2'>Time Range</label>
-                                    <Select
-                                        value={dateRange}
-                                        onChange={(e) => setDateRange(e.target.value)}
-                                        className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-brand focus:ring-1 focus:ring-brand hover:border-zinc-500 transition-colors duration-150'
-                                    >
-                                        <option value='all' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            All Time
-                                        </option>
-                                        <option value='1h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            Last Hour
-                                        </option>
-                                        <option value='24h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            Last 24 Hours
-                                        </option>
-                                        <option value='7d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            Last 7 Days
-                                        </option>
-                                        <option value='30d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            Last 30 Days
-                                        </option>
-                                    </Select>
-                                </div>
-
-                                <div className='flex items-end'>
-                                    {hasActiveFilters && (
-                                        <ActionButton
-                                            variant='secondary'
-                                            onClick={clearAllFilters}
-                                            className='flex items-center gap-2 w-full'
-                                        >
-                                            <Xmark width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                            Clear All Filters
-                                        </ActionButton>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                <div
-                    className='transform-gpu skeleton-anim-2'
-                    style={{
-                        animationDelay: '125ms',
-                        animationTimingFunction:
-                            'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
-                    }}
-                >
-                    <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-4 hover:border-[#ffffff20] transition-all duration-150 shadow-sm'>
-                        <div className='flex items-center gap-2 mb-4'>
-                            <div className='w-5 h-5 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
-                                <ClockArrowRotateLeft
-                                    width={22}
-                                    height={22}
-                                    className=' text-zinc-400'
-                                    fill='currentColor'
-                                />
-                            </div>
-                            <h3 className='text-base font-semibold text-zinc-100'>Events</h3>
-                            {filteredData?.items && (
-                                <span className='text-sm text-zinc-400'>
-                                    ({filteredData.items.length} {filteredData.items.length === 1 ? 'event' : 'events'})
-                                </span>
-                            )}
-                        </div>
-
-                        {!data && isValidating ? (
-                            <Spinner centered />
-                        ) : !filteredData?.items?.length ? (
-                            <div className='text-center py-12'>
-                                <h3 className='text-lg font-semibold text-zinc-300 mb-2'>
-                                    {hasActiveFilters ? 'No Matching Activity' : 'No Server Activity Yet'}
-                                </h3>
-                                <p className='text-sm text-zinc-400 mb-4 max-w-lg mx-auto leading-relaxed'>
-                                    {hasActiveFilters
-                                        ? "Try adjusting your filters or search terms to find the activity you're looking for."
-                                        : 'Server activity logs will appear here as you manage your server. Start your server or perform actions to see them here.'}
-                                </p>
-                                {hasActiveFilters && (
-                                    <div className='flex gap-2 justify-center'>
-                                        <ActionButton variant='secondary' onClick={clearAllFilters}>
-                                            Clear All Filters
-                                        </ActionButton>
-                                        <ActionButton variant='secondary' onClick={() => setShowFilters(true)}>
-                                            Adjust Filters
-                                        </ActionButton>
-                                    </div>
+                                <h3 className='text-base font-semibold text-zinc-100'>Events</h3>
+                                {filteredData?.items && (
+                                    <span className='text-sm text-zinc-400'>
+                                        ({filteredData.items.length}{' '}
+                                        {filteredData.items.length === 1 ? 'event' : 'events'})
+                                    </span>
                                 )}
                             </div>
-                        ) : (
-                            <div className='divide-y divide-zinc-800/30'>
-                                {filteredData.items.map((activity) => (
-                                    <ActivityLogEntry key={activity.id} activity={activity}>
-                                        <span />
-                                    </ActivityLogEntry>
-                                ))}
-                            </div>
-                        )}
 
-                        {data && (
-                            <div className='mt-4'>
-                                <PaginationFooter
-                                    pagination={data.pagination}
-                                    onPageSelect={(page) => setFilters((value) => ({ ...value, page }))}
-                                />
-                            </div>
-                        )}
+                            {!data && isValidating ? (
+                                <Spinner centered />
+                            ) : !filteredData?.items?.length ? (
+                                <div className='text-center py-12'>
+                                    <h3 className='text-lg font-semibold text-zinc-300 mb-2'>
+                                        {hasActiveFilters ? 'No Matching Activity' : 'No Server Activity Yet'}
+                                    </h3>
+                                    <p className='text-sm text-zinc-400 mb-4 max-w-lg mx-auto leading-relaxed'>
+                                        {hasActiveFilters
+                                            ? "Try adjusting your filters or search terms to find the activity you're looking for."
+                                            : 'Server activity logs will appear here as you manage your server. Start your server or perform actions to see them here.'}
+                                    </p>
+                                    {hasActiveFilters && (
+                                        <div className='flex gap-2 justify-center'>
+                                            <Button variant='secondary' onClick={clearAllFilters}>
+                                                Clear All Filters
+                                            </Button>
+                                            <Button variant='secondary' onClick={() => setShowFilters(true)}>
+                                                Adjust Filters
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className='divide-y divide-zinc-800/30'>
+                                    {filteredData.items.map((activity) => (
+                                        <ActivityLogEntry key={activity.id} activity={activity}>
+                                            <span />
+                                        </ActivityLogEntry>
+                                    ))}
+                                </div>
+                            )}
+
+                            {data && (
+                                <div className='mt-4'>
+                                    <PaginationFooter
+                                        pagination={data.pagination}
+                                        onPageSelect={(page) => setFilters((value) => ({ ...value, page }))}
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
+                </ErrorBoundary>
             </div>
         </ServerContentBlock>
     );

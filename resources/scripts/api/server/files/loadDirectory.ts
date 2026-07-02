@@ -24,8 +24,8 @@ export default async (uuid: string, directory?: string): Promise<FileObject[]> =
 
     const files = (data.data || []).map(rawDataToFileObject);
 
-    if (files.length > 500) {
-        files.length = 500;
+    if (files.length > 1000) {
+        files.length = 1000;
     }
 
     return files;

@@ -1,11 +1,11 @@
-import { Model } from '@definitions/index';
+import type { Model } from '@definitions/index';
 
 import {
-    FractalPaginatedResponse,
-    FractalResponseData,
-    FractalResponseList,
-    PaginatedResult,
+    type FractalPaginatedResponse,
+    type FractalResponseData,
+    type FractalResponseList,
     getPaginationSet,
+    type PaginatedResult,
 } from '@/api/http';
 
 type TransformerFunc<T> = (callback: FractalResponseData) => T;
@@ -53,4 +53,4 @@ function toPaginatedSet<T extends TransformerFunc<Model>>(
     };
 }
 
-export { transform, toPaginatedSet };
+export { toPaginatedSet, transform };

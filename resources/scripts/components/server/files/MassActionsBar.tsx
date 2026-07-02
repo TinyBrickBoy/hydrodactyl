@@ -1,19 +1,15 @@
 import { useEffect, useState } from 'react';
-
-import ActionButton from '@/components/elements/ActionButton';
-import Spinner from '@/components/elements/Spinner';
-import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
-import { Dialog } from '@/components/elements/dialog';
-import FadeTransition from '@/components/elements/transitions/FadeTransition';
-import RenameFileModal from '@/components/server/files/RenameFileModal';
-
 import compressFiles from '@/api/server/files/compressFiles';
 import deleteFiles from '@/api/server/files/deleteFiles';
-
-import { ServerContext } from '@/state/server';
-
+import { Dialog } from '@/components/elements/dialog';
+import Spinner from '@/components/elements/Spinner';
+import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import FadeTransition from '@/components/elements/transitions/FadeTransition';
+import RenameFileModal from '@/components/server/files/RenameFileModal';
+import { Button } from '@/components/ui/button';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 const MassActionsBar = () => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
@@ -103,18 +99,18 @@ const MassActionsBar = () => {
                         }
                     >
                         <div className={`flex items-center space-x-4 pointer-events-auto rounded-sm p-4 bg-black/50`}>
-                            <ActionButton onClick={() => setShowMove(true)} disabled={loading}>
+                            <Button onClick={() => setShowMove(true)} disabled={loading}>
                                 {loading && loadingMessage.includes('Moving') && <Spinner size='small' />}
                                 Move
-                            </ActionButton>
-                            <ActionButton onClick={onClickCompress} disabled={loading}>
+                            </Button>
+                            <Button onClick={onClickCompress} disabled={loading}>
                                 {loading && loadingMessage.includes('Archiving') && <Spinner size='small' />}
                                 Archive
-                            </ActionButton>
-                            <ActionButton variant='danger' onClick={() => setShowConfirm(true)} disabled={loading}>
+                            </Button>
+                            <Button variant='destructive' onClick={() => setShowConfirm(true)} disabled={loading}>
                                 {loading && loadingMessage.includes('Deleting') && <Spinner size='small' />}
                                 Delete
-                            </ActionButton>
+                            </Button>
                         </div>
                     </div>
                 </FadeTransition>

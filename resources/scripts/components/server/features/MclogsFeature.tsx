@@ -1,21 +1,16 @@
 import { Check, Link, TriangleExclamation } from '@gravity-ui/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-
-import ActionButton from '@/components/elements/ActionButton';
+import { analyzeLogs, type MclogsInsight } from '@/api/mclo.gs/mclogsApi';
+import getFileContents from '@/api/server/files/getFileContents';
+import { Alert } from '@/components/elements/alert';
 import Modal from '@/components/elements/Modal';
 import Spinner from '@/components/elements/Spinner';
-import { Alert } from '@/components/elements/alert';
 import { SocketEvent } from '@/components/server/events';
-
+import { Button } from '@/components/ui/button';
 import { debounce, isCrashLine } from '@/lib/mclogsUtils';
-
-import { MclogsInsight, analyzeLogs } from '@/api/mclo.gs/mclogsApi';
-import getFileContents from '@/api/server/files/getFileContents';
-
-import { ServerContext } from '@/state/server';
-
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
+import { ServerContext } from '@/state/server';
 
 const CRASH_DETECTION_DEBOUNCE = 1500; // 1.5 seconds
 const MANUAL_ANALYZE_DEBOUNCE = 1000; // 1 second for manual clicks
@@ -221,13 +216,13 @@ export const CrashAnalysisCard = () => {
                         </div>
                         <div className='flex items-center gap-2 flex-shrink-0'>
                             {canViewAnalysis && (
-                                <ActionButton variant='secondary' onClick={() => setModalVisible(true)} size='sm'>
+                                <Button variant='secondary' onClick={() => setModalVisible(true)} size='sm'>
                                     View Details
-                                </ActionButton>
+                                </Button>
                             )}
-                            <ActionButton variant='secondary' onClick={dismissCard} size='sm'>
+                            <Button variant='secondary' onClick={dismissCard} size='sm'>
                                 Dismiss
-                            </ActionButton>
+                            </Button>
                         </div>
                     </div>
                 </Alert>
@@ -505,12 +500,12 @@ const AnalysisModal = ({
                 {renderContent()}
 
                 <div className='flex justify-center gap-3 mt-8 pt-4 border-t border-neutral-700'>
-                    <ActionButton variant='secondary' onClick={manualAnalyze} disabled={analyzing}>
+                    <Button variant='secondary' onClick={manualAnalyze} disabled={analyzing}>
                         {analyzing ? 'Analyzing...' : 'Analyze Again'}
-                    </ActionButton>
-                    <ActionButton variant='primary' onClick={closeModal} disabled={analyzing}>
+                    </Button>
+                    <Button onClick={closeModal} disabled={analyzing}>
                         Close
-                    </ActionButton>
+                    </Button>
                 </div>
             </div>
         </Modal>

@@ -1,4 +1,4 @@
-import { BaseCaptchaProvider, CaptchaRenderConfig } from '../CaptchaProvider';
+import { BaseCaptchaProvider, type CaptchaRenderConfig } from '../CaptchaProvider';
 
 export class NullProvider extends BaseCaptchaProvider {
     getName(): string {

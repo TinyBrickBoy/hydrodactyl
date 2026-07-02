@@ -1,4 +1,4 @@
-import { DependencyList, useMemo } from 'react';
+import { type DependencyList, useMemo } from 'react';
 
 import { useDeepMemoize } from '@/plugins/useDeepMemoize';
 

@@ -3,12 +3,11 @@
 import { ArrowDownToLine } from '@gravity-ui/icons';
 import { Link } from 'react-router-dom';
 
-import ActionButton from '@/components/elements/ActionButton';
 import Button from '@/components/elements/ButtonV2';
 
 // import { ServerContext } from '@/state/server';
 
-import { Mod } from './config';
+import type { Mod } from './config';
 
 interface ModCardProps {
     mod: Mod;
@@ -23,7 +22,7 @@ export const ModCard = ({ mod }: ModCardProps) => {
     };
 
     return (
-        <div className='group bg-gradient-to-br from-[#090909] via-[#0f0f0f] to-[#131313] transition delay-50 duration-325  rounded-xl overflow-hidden border border-gray-800/70 hover:border-brand/60 transition-all duration-300 hover:shadow-2xl hover:shadow-brand/15 backdrop-blur-sm'>
+        <div className='group bg-gradient-to-br from-[#090909] via-[#0f0f0f] to-[#131313] transition delay-50 duration-325 rounded-xl overflow-hidden border border-gray-800/70 hover:border-brand/60 transition-all duration-300 hover:shadow-2xl hover:shadow-brand/15 backdrop-blur-sm'>
             <div className='p-6 flex items-start space-x-5'>
                 {/* Icon Container */}
                 <div className='flex-shrink-0 relative hover:cursor-pointer hover:scale-105 transition-transform duration-300'>

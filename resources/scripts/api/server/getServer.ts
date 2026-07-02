@@ -1,5 +1,5 @@
-import http, { FractalResponseData, FractalResponseList } from '@/api/http';
-import { ServerEggVariable, ServerStatus } from '@/api/server/types';
+import http, { type FractalResponseData, type FractalResponseList } from '@/api/http';
+import type { ServerEggVariable, ServerStatus } from '@/api/server/types';
 import { rawDataToServerAllocation, rawDataToServerEggVariable } from '@/api/transformers';
 
 // import { getGlobalDaemonType } from '@/api/server/getServer';

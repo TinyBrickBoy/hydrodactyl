@@ -3,11 +3,11 @@
 import { Ellipsis } from '@gravity-ui/icons';
 import { useStoreState } from 'easy-peasy';
 import type { RefObject } from 'react';
-import { Fragment, Suspense, createRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createRef, Fragment, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom';
-
-import routes, { type ServerRouteDefinition, getServerNavRoutes } from '@/routers/routes';
-
+import http, { httpErrorToHuman } from '@/api/http';
+import { getSubdomainInfo } from '@/api/server/network/subdomain';
+import CommandMenu from '@/components/elements/commandk/CmdK';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,24 +16,20 @@ import {
     DropdownMenuTrigger,
 } from '@/components/elements/DropdownMenu';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
+import Logo from '@/components/elements/HydroLogo';
 import MainSidebar from '@/components/elements/MainSidebar';
 import MainWrapper from '@/components/elements/MainWrapper';
 import { ServerMobileMenu } from '@/components/elements/MobileFullScreenMenu';
 import MobileTopBar from '@/components/elements/MobileTopBar';
 import PermissionRoute from '@/components/elements/PermissionRoute';
-import Logo from '@/components/elements/HydroLogo';
 import { NotFound, ServerError } from '@/components/elements/ScreenBlock';
-import CommandMenu from '@/components/elements/commandk/CmdK';
 import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
+import StatBlock from '@/components/server/console/StatBlock';
 import InstallListener from '@/components/server/InstallListener';
 import ServerSidebarNavItem from '@/components/server/ServerSidebarNavItem';
 import TransferListener from '@/components/server/TransferListener';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
-import StatBlock from '@/components/server/console/StatBlock';
-
-import { httpErrorToHuman } from '@/api/http';
-import http from '@/api/http';
-import { getSubdomainInfo } from '@/api/server/network/subdomain';
+import routes, { getServerNavRoutes, type ServerRouteDefinition } from '@/routers/routes';
 
 import { ServerContext } from '@/state/server';
 
@@ -335,7 +331,7 @@ const ServerRouter = () => {
                                         ref={getRefForRoute(route)}
                                         route={route}
                                         serverId={id}
-                                        onClick={() => { }}
+                                        onClick={() => {}}
                                     />
                                 ))}
                             </ul>
@@ -361,7 +357,7 @@ const ServerRouter = () => {
                                 className='relative inset-[1px] w-full h-full overflow-y-auto overflow-x-hidden rounded-md bg-[#08080875]'
                             >
                                 {inConflictState &&
-                                    (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
+                                (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
                                     <ConflictStateRenderer />
                                 ) : (
                                     <ErrorBoundary>

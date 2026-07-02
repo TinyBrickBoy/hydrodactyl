@@ -1,5 +1,5 @@
 import http from '@/api/http';
-import { ServerDatabase, rawDataToServerDatabase } from '@/api/server/databases/getServerDatabases';
+import { rawDataToServerDatabase, type ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import { getGlobalDaemonType } from '@/api/server/getServer';
 
 export default (uuid: string, database: string): Promise<ServerDatabase> => {

@@ -36,5 +36,5 @@ type LinkProps = Omit<JSX.IntrinsicElements['a'], 'ref' | keyof Props> & Props;
 
 const LinkButton: React.FC<LinkProps> = (props) => <ButtonStyle as={'a'} {...props} />;
 
-export { LinkButton, ButtonStyle };
+export { ButtonStyle, LinkButton };
 export default Button;

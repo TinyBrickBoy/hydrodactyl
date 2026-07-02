@@ -1,29 +1,25 @@
-import { hashToPath } from '@/helpers';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import debounce from 'debounce';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-
+import { httpErrorToHuman } from '@/api/http';
+import type { FileObject } from '@/api/server/files/loadDirectory';
 import Can from '@/components/elements/Can';
 import { Checkbox } from '@/components/elements/CheckboxNew';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
-import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import { ServerError } from '@/components/elements/ScreenBlock';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
+import VirtualizedList from '@/components/elements/VirtualizedList';
 import FileManagerBreadcrumbs from '@/components/server/files/FileManagerBreadcrumbs';
 import FileManagerStatus from '@/components/server/files/FileManagerStatus';
 import FileObjectRow from '@/components/server/files/FileObjectRow';
 import MassActionsBar from '@/components/server/files/MassActionsBar';
 import NewDirectoryButton from '@/components/server/files/NewDirectoryButton';
 import UploadButton from '@/components/server/files/UploadButton';
-
-import { httpErrorToHuman } from '@/api/http';
-import { FileObject } from '@/api/server/files/loadDirectory';
-
+import ServerHeader from '@/components/server/header/ServerHeader';
+import { hashToPath } from '@/helpers';
+import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useStoreActions } from '@/state/hooks';
 import { ServerContext } from '@/state/server';
-
-import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 
 import NewFileButton from './NewFileButton';
 
@@ -35,9 +31,8 @@ const sortFiles = (files: FileObject[]): FileObject[] => {
 };
 
 const FileManagerContainer = () => {
-    const parentRef = useRef<HTMLDivElement | null>(null);
-
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
+
     const { hash, pathname } = useLocation();
     const { data: files, error, mutate } = useFileManagerSwr();
 
@@ -84,13 +79,6 @@ const FileManagerContainer = () => {
             searchInputRef.current.value = '';
         }
     }, [hash, pathname, directory]);
-    const rowVirtualizer = useVirtualizer({
-        // count: 10000,
-        count: filesArray.length,
-        getScrollElement: () => parentRef.current,
-        estimateSize: () => 54,
-        // scrollMargin: 54,
-    });
 
     if (error) {
         return <ServerError title={'Something went wrong.'} message={httpErrorToHuman(error)} />;
@@ -98,27 +86,19 @@ const FileManagerContainer = () => {
 
     return (
         <ServerContentBlock className='p-0!' title={'File Manager'} showFlashKey={'files'}>
-            <div className='px-2 sm:px-14 pt-2 h-full sm:pt-14'>
+            <div className='px-2 sm:px-14 pt-2 h-fit sm:pt-14'>
                 <ErrorBoundary>
-                    <MainPageHeader
-                        direction='column'
-                        title={'Files'}
-                        titleChildren={
-                            <Can action={'file.create'}>
-                                <div className='flex flex-row gap-1'>
-                                    <FileManagerStatus />
-                                    <NewDirectoryButton />
-                                    <NewFileButton id={id} />
-                                    <UploadButton />
-                                </div>
-                            </Can>
-                        }
-                    >
-                        <p className='text-sm text-neutral-400 leading-relaxed'>
-                            Manage your server files and directories. Upload, download, edit, and organize your
-                            server&apos;s file system with our integrated file manager.
-                        </p>
-                    </MainPageHeader>
+                    <ServerHeader />
+                    <Can action={'file.create'}>
+                        <div className='flex flex-row gap-1 pb-4'>
+                            <FileManagerStatus />
+                            <div className='gap-0'>
+                                <NewDirectoryButton />
+                                <NewFileButton id={id} />
+                            </div>
+                            <UploadButton />
+                        </div>
+                    </Can>
                     <div className={'flex flex-wrap-reverse md:flex-nowrap mb-4'}>
                         <FileManagerBreadcrumbs
                             renderLeft={
@@ -164,43 +144,17 @@ const FileManagerContainer = () => {
                                     onChange={(event) => debouncedSearchTerm(event.target.value)}
                                 />
                             </div>
-                            <div ref={parentRef} className='max-h-screen min-h-screen overflow-auto'>
-                                <div
-                                    data-pyro-file-manager-files
-                                    className='p-1 border-[1px] border-[#ffffff12] rounded-xl sm:ml-12 sm:mr-12 mx-2 bg-[radial-gradient(124.75%_124.75%_at_50.01%_-10.55%,_rgb(16,16,16)_0%,rgb(4,4,4)_100%)]'
-                                    style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
-                                >
-                                    <div
-                                        className='w-full overflow-hidden rounded-lg gap-0.5 flex flex-col'
-                                        style={{
-                                            height: `${rowVirtualizer.getTotalSize()}px`,
-                                            width: '100%',
-                                            position: 'relative',
-                                        }}
-                                    >
-                                        {rowVirtualizer.getVirtualItems().map((item) => {
-                                            if (filesArray[item.index] !== undefined) {
-                                                return (
-                                                    <div
-                                                        key={item.key}
-                                                        className='w-full absolute left-0 top-0'
-                                                        style={{
-                                                            height: `${item.size}px`,
-                                                            transform: `translateY(${item.start}px)`,
-                                                        }}
-                                                    >
-                                                        <FileObjectRow
-                                                            // @ts-expect-error - Legacy type suppression
-                                                            file={filesArray[item.index]}
-                                                            key={filesArray[item.index]?.name}
-                                                        />
-                                                    </div>
-                                                );
-                                            }
-                                            return <></>;
-                                        })}
-                                    </div>
-                                </div>
+                            <div
+                                data-pyro-file-manager-files
+                                className='p-1 border-[1px] border-[#ffffff12] rounded-xl sm:ml-12 sm:mr-12 mx-2 bg-[radial-gradient(124.75%_124.75%_at_50.01%_-10.55%,_rgb(16,16,16)_0%,rgb(4,4,4)_100%)]'
+                            >
+                                <VirtualizedList
+                                    itemClassName=''
+                                    items={filesArray}
+                                    renderItem={(file) => <FileObjectRow file={file} />}
+                                    estimateSize={() => 54}
+                                    gap={2}
+                                />
                             </div>
                             <MassActionsBar />
                         </>

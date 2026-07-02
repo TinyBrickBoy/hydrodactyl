@@ -1,33 +1,29 @@
 import { Database, Eye, TrashBin } from '@gravity-ui/icons';
-import { Form, Formik, FormikHelpers } from 'formik';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { object, string } from 'yup';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import { httpErrorToHuman } from '@/api/http';
+import deleteServerDatabase from '@/api/server/databases/deleteServerDatabase';
+import type { ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import Can from '@/components/elements/Can';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import Field from '@/components/elements/Field';
 import Input from '@/components/elements/Input';
 import Modal from '@/components/elements/Modal';
-import Spinner from '@/components/elements/Spinner';
 import { PageListItem } from '@/components/elements/pages/PageList';
+import Spinner from '@/components/elements/Spinner';
+import FlashMessageRender from '@/components/FlashMessageRender';
 import RotatePasswordButton from '@/components/server/databases/RotatePasswordButton';
-
-import { httpErrorToHuman } from '@/api/http';
-import deleteServerDatabase from '@/api/server/databases/deleteServerDatabase';
-import { ServerDatabase } from '@/api/server/databases/getServerDatabases';
-
+import { Button } from '@/components/ui/button';
+import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
-import useFlash from '@/plugins/useFlash';
-
 const Label = styled.label`
-    display: inline-block;
-    color: #ffffff77;
-    font-size: 0.875rem;
-    padding-bottom: 0.5rem;
+  display: inline-block;
+  color: #ffffff77;
+  font-size: 0.875rem;
+  padding-bottom: 0.5rem;
 `;
 
 interface Props {
@@ -99,15 +95,15 @@ const DatabaseRow = ({ database }: Props) => {
                                     label={'Confirm Database Name'}
                                     description={'Enter the database name to confirm deletion.'}
                                 />
-                                <ActionButton
-                                    variant='danger'
+                                <Button
+                                    variant='destructive'
                                     type={'submit'}
                                     className='min-w-full my-6'
                                     disabled={!isValid || isSubmitting}
                                 >
                                     {isSubmitting && <Spinner size='small' />}
                                     {isSubmitting ? 'Deleting...' : 'Delete Database'}
-                                </ActionButton>
+                                </Button>
                             </Form>
                         </div>
                     </Modal>
@@ -208,7 +204,7 @@ const DatabaseRow = ({ database }: Props) => {
                     </div>
 
                     <div className='flex items-center gap-2 sm:flex-col sm:gap-3'>
-                        <ActionButton
+                        <Button
                             variant='secondary'
                             size='sm'
                             onClick={() => setConnectionVisible(true)}
@@ -216,17 +212,17 @@ const DatabaseRow = ({ database }: Props) => {
                         >
                             <Eye fill='currentColor' className='w-4 h-4' />
                             <span className='hidden sm:inline'>Details</span>
-                        </ActionButton>
+                        </Button>
                         <Can action={'database.delete'}>
-                            <ActionButton
-                                variant='danger'
+                            <Button
+                                variant='destructive'
                                 size='sm'
                                 onClick={() => setVisible(true)}
                                 className='flex items-center gap-2'
                             >
                                 <TrashBin fill='currentColor' className='w-4 h-4' />
                                 <span className='hidden sm:inline'>Delete</span>
-                            </ActionButton>
+                            </Button>
                         </Can>
                     </div>
                 </div>

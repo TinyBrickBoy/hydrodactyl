@@ -1,4 +1,4 @@
-import { CaptchaProviderInterface } from './CaptchaProvider';
+import type { CaptchaProviderInterface } from './CaptchaProvider';
 import { HCaptchaProvider } from './providers/HCaptchaProvider';
 import { NullProvider } from './providers/NullProvider';
 import { RecaptchaProvider } from './providers/RecaptchaProvider';
@@ -16,7 +16,7 @@ export class CaptchaProviderFactory {
      * Create a captcha provider instance
      */
     static create(providerName: string): CaptchaProviderInterface {
-        const providerFactory = this.providers.get(providerName);
+        const providerFactory = CaptchaProviderFactory.providers.get(providerName);
 
         if (!providerFactory) {
             console.warn(`Unknown captcha provider: ${providerName}, falling back to null provider`);
@@ -30,20 +30,20 @@ export class CaptchaProviderFactory {
      * Register a new captcha provider
      */
     static register(name: string, factory: () => CaptchaProviderInterface): void {
-        this.providers.set(name, factory);
+        CaptchaProviderFactory.providers.set(name, factory);
     }
 
     /**
      * Get all available provider names
      */
     static getAvailableProviders(): string[] {
-        return Array.from(this.providers.keys());
+        return Array.from(CaptchaProviderFactory.providers.keys());
     }
 
     /**
      * Check if a provider is available
      */
     static hasProvider(name: string): boolean {
-        return this.providers.has(name);
+        return CaptchaProviderFactory.providers.has(name);
     }
 }

@@ -1,5 +1,5 @@
 /*Design for Terminal*/
-@import url('https://fonts.bunny.net/css?family=Source+Code+Pro');
+@import url("https://fonts.bunny.net/css?family=Source+Code+Pro");
 
 #terminal-body {
     background: rgb(26, 26, 26);
@@ -10,7 +10,7 @@
 }
 
 #terminal {
-    font-family: 'Source Code Pro', monospace;
+    font-family: "Source Code Pro", monospace;
     color: rgb(223, 223, 223);
     background: rgb(26, 26, 26);
     font-size: 12px;
@@ -39,7 +39,7 @@
 
 .terminal_input--input,
 .terminal_input--prompt {
-    font-family: 'Source Code Pro', monospace;
+    font-family: "Source Code Pro", monospace;
     margin-bottom: 0;
     border: 0 !important;
     background: transparent !important;

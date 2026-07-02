@@ -1,8 +1,10 @@
 import http from '@/api/http';
 import { getGlobalDaemonType } from '@/api/server/getServer';
-import { Schedule, rawDataToServerSchedule } from '@/api/server/schedules/getServerSchedules';
+import { rawDataToServerSchedule, type Schedule } from '@/api/server/schedules/getServerSchedules';
 
-type Data = Pick<Schedule, 'cron' | 'name' | 'onlyWhenOnline' | 'isActive'> & { id?: number };
+type Data = Pick<Schedule, 'cron' | 'name' | 'onlyWhenOnline' | 'isActive'> & {
+    id?: number;
+};
 
 export default async (uuid: string, schedule: Data): Promise<Schedule> => {
     const { data } = await http.post(

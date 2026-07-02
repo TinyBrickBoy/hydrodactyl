@@ -34,7 +34,10 @@ const ItemContainer = ({
         >
             {icon && (
                 <div className={`w-10 h-10 items-center justify-center hidden sm:flex`}>
-                    {React.createElement(icon, { className: 'w-6 h-6', fill: 'currentColor' })}
+                    {React.createElement(icon, {
+                        className: 'w-6 h-6',
+                        fill: 'currentColor',
+                    })}
                 </div>
             )}
             <div className={`flex flex-1 flex-col`}>

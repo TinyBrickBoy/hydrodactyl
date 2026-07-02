@@ -1,22 +1,18 @@
-import { encodePathSegments } from '@/helpers';
-import { File, FolderOpenFill } from '@gravity-ui/icons';
+import { File, FileZipper, FolderOpenFill } from '@gravity-ui/icons';
 import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
 import { join } from 'pathe';
-import { ReactNode, memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import isEqual from 'react-fast-compare';
 import { NavLink } from 'react-router-dom';
+import type { FileObject } from '@/api/server/files/loadDirectory';
 
 import { ContextMenu, ContextMenuTrigger } from '@/components/elements/ContextMenu';
 import SelectFileCheckbox from '@/components/server/files/SelectFileCheckbox';
-
+import { encodePathSegments } from '@/helpers';
 import { bytesToString } from '@/lib/formatters';
-
-import { FileObject } from '@/api/server/files/loadDirectory';
-
+import { usePermissions } from '@/plugins/usePermissions';
 // import FileDropdownMenu from '@/components/server/files/FileDropdownMenu';
 import { ServerContext } from '@/state/server';
-
-import { usePermissions } from '@/plugins/usePermissions';
 
 import FileDropdownMenu from './FileDropdownMenu';
 import styles from './style.module.css';
@@ -39,6 +35,16 @@ function Clickable({ file, children }: { file: FileObject; children: ReactNode }
     );
 }
 
+const icon = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+
+    if (['zip'].includes(extension || '')) {
+        return <FileZipper width={22} height={22} />;
+    }
+
+    return <File width={22} height={22} />;
+};
+
 const MemoizedClickable = memo(Clickable, isEqual);
 
 const FileObjectRow = ({ file }: { file: FileObject }) => (
@@ -49,9 +55,7 @@ const FileObjectRow = ({ file }: { file: FileObject }) => (
                 <MemoizedClickable file={file}>
                     <div className={`flex-none text-zinc-400 mr-4 text-lg pl-3 mb-0.5`}>
                         {file.isFile ? (
-                            <div>
-                                <File width={22} height={22} />
-                            </div>
+                            <div>{icon(file.name)}</div>
                         ) : (
                             <div>
                                 <FolderOpenFill width={22} height={22} />

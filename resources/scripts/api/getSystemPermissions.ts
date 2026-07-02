@@ -1,6 +1,6 @@
 import http from '@/api/http';
 
-import { PanelPermissions } from '@/state/permissions';
+import type { PanelPermissions } from '@/state/permissions';
 
 export default (): Promise<PanelPermissions> => {
     return new Promise((resolve, reject) => {

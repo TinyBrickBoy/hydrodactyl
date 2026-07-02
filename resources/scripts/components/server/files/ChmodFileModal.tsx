@@ -1,16 +1,12 @@
-import { fileBitsToString } from '@/helpers';
-import { Form, Formik, FormikHelpers } from 'formik';
-
-import ActionButton from '@/components/elements/ActionButton';
-import Field from '@/components/elements/Field';
-import Modal, { RequiredModalProps } from '@/components/elements/Modal';
-
+import { Form, Formik, type FormikHelpers } from 'formik';
 import chmodFiles from '@/api/server/files/chmodFiles';
-
-import { ServerContext } from '@/state/server';
-
+import Field from '@/components/elements/Field';
+import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
+import { Button } from '@/components/ui/button';
+import { fileBitsToString } from '@/helpers';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 interface FormikValues {
     mode: string;
@@ -78,9 +74,9 @@ const ChmodFileModal = ({ files, ...props }: OwnProps) => {
                                 />
                             </div>
                             <div className={`flex justify-end w-full my-6`}>
-                                <ActionButton variant='primary' type='submit'>
+                                <Button variant='attention' type='submit'>
                                     Update
-                                </ActionButton>
+                                </Button>
                             </div>
                         </div>
                     </Form>

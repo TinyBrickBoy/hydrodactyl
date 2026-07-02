@@ -1,23 +1,22 @@
-import { Form, Formik, FormikHelpers } from 'formik';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { join } from 'pathe';
-
-import ActionButton from '@/components/elements/ActionButton';
+import renameFiles from '@/api/server/files/renameFiles';
 import Code from '@/components/elements/Code';
 import Field from '@/components/elements/Field';
-import Modal, { RequiredModalProps } from '@/components/elements/Modal';
-
-import renameFiles from '@/api/server/files/renameFiles';
-
-import { ServerContext } from '@/state/server';
-
+import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
+import { Button } from '@/components/ui/button';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 interface FormikValues {
     name: string;
 }
 
-type OwnProps = RequiredModalProps & { files: string[]; useMoveTerminology?: boolean };
+type OwnProps = RequiredModalProps & {
+    files: string[];
+    useMoveTerminology?: boolean;
+};
 
 const RenameFileModal = ({ files, useMoveTerminology, ...props }: OwnProps) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
@@ -82,9 +81,9 @@ const RenameFileModal = ({ files, useMoveTerminology, ...props }: OwnProps) => {
                                 </p>
                             )}
                             <div className={`flex justify-end w-full my-6`}>
-                                <ActionButton variant='primary' type='submit'>
+                                <Button variant='attention' type='submit'>
                                     {useMoveTerminology ? 'Move' : 'Rename'}
-                                </ActionButton>
+                                </Button>
                             </div>
                         </div>
                     </Form>

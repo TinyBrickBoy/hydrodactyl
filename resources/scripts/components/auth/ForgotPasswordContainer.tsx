@@ -1,24 +1,14 @@
-import { useStoreState } from 'easy-peasy';
 import type { FormikHelpers } from 'formik';
 import { Formik } from 'formik';
-import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { object, string } from 'yup';
-
-import LoginFormContainer from '@/components/auth/LoginFormContainer';
+import http, { httpErrorToHuman } from '@/api/http';
+import LoginFormContainer, { ReturnToLogin, TitleSection } from '@/components/auth/LoginFormContainer';
 import Button from '@/components/elements/Button';
 import Captcha, { getCaptchaResponse } from '@/components/elements/Captcha';
-import ContentBox from '@/components/elements/ContentBox';
 import Field from '@/components/elements/Field';
-
 import CaptchaManager from '@/lib/captcha';
-
-import { httpErrorToHuman } from '@/api/http';
-import http from '@/api/http';
-
 import useFlash from '@/plugins/useFlash';
-
-import Logo from '../elements/HydroLogo';
+import SecondaryLink from '../ui/secondary-link';
 
 interface Values {
     email: string;
@@ -44,11 +34,19 @@ const ForgotPasswordContainer = () => {
         http.post('/auth/password', requestData)
             .then((response) => {
                 resetForm();
-                addFlash({ type: 'success', title: 'Success', message: response.data.status || 'Email sent!' });
+                addFlash({
+                    type: 'success',
+                    title: 'Success',
+                    message: response.data.status || 'Email sent!',
+                });
             })
             .catch((error) => {
                 console.error(error);
-                addFlash({ type: 'error', title: 'Error', message: httpErrorToHuman(error) });
+                addFlash({
+                    type: 'error',
+                    title: 'Error',
+                    message: httpErrorToHuman(error),
+                });
             })
             .finally(() => {
                 setSubmitting(false);
@@ -56,67 +54,47 @@ const ForgotPasswordContainer = () => {
     };
 
     return (
-        <ContentBox>
-            <Formik
-                onSubmit={handleSubmission}
-                initialValues={{ email: '' }}
-                validationSchema={object().shape({
-                    email: string().email('Enter a valid email address.').required('Email is required.'),
-                })}
-            >
-                {({ isSubmitting }) => (
-                    <LoginFormContainer className={`w-full flex`}>
-                        <Link to='/'>
-                            <div className='flex h-12 mb-4 items-center w-full'>
-                                <Logo />
-                            </div>
-                        </Link>
-                        <div aria-hidden className='my-8 bg-[#ffffff33] min-h-[1px]'></div>
-                        <h2 className='text-xl font-extrabold mb-2'>Reset Password</h2>
-                        <div className='text-sm mb-6'>
-                            We&apos;ll send you an email with a link to reset your password.
-                        </div>
-                        <Field id='email' label={'Email'} name={'email'} type={'email'} />
+        <Formik
+            onSubmit={handleSubmission}
+            initialValues={{ email: '' }}
+            validationSchema={object().shape({
+                email: string().email('Enter a valid email address.').required('Email is required.'),
+            })}
+        >
+            {({ isSubmitting }) => (
+                <LoginFormContainer className={`w-full flex flex-col`}>
+                    <TitleSection title='Forgot Password' />
+                    <div className='text-sm mb-6'>We&apos;ll send you an email with a link to reset your password.</div>
+                    <Field id='email' label={'Email'} name={'email'} type={'email'} />
 
-                        <Captcha
-                            className='mt-6'
-                            onError={(error) => {
-                                console.error('Captcha error:', error);
-                                addFlash({
-                                    type: 'error',
-                                    title: 'Error',
-                                    message: 'Captcha verification failed. Please try again.',
-                                });
-                            }}
-                        />
-
-                        <div className='mt-6'>
-                            <Button
-                                className={`w-full mt-4 rounded-full bg-brand border-0 ring-0 outline-hidden capitalize font-bold text-sm py-2`}
-                                type='submit'
-                                size='xlarge'
-                                isLoading={isSubmitting}
-                                disabled={isSubmitting}
-                            >
-                                Send Email
-                            </Button>
-                        </div>
-
-                        <div aria-hidden className='my-8 bg-[#ffffff33] min-h-[1px]'></div>
-                        <div
-                            className={`text-center w-full rounded-lg border-0 ring-0 outline-hidden capitalize font-bold text-sm py-2 `}
+                    <div className='flex w-full justify-between items-center'>
+                        <Button
+                            className={`bg-mocha-100 text-black p-2 px-4 mt-4 rounded-full border-0 ring-0 outline-hidden capitalize`}
+                            type='submit'
+                            size='xlarge'
+                            isLoading={isSubmitting}
+                            disabled={isSubmitting}
                         >
-                            <Link
-                                to='/auth/login'
-                                className='block w-full text-center py-2.5 px-4 text-xs font-medium tracking-wide uppercase text-white hover:text-white/80 transition-colors duration-200 border border-white/20 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30'
-                            >
-                                Return to Login
-                            </Link>
-                        </div>
-                    </LoginFormContainer>
-                )}
-            </Formik>
-        </ContentBox>
+                            Send Email
+                        </Button>
+
+                        <SecondaryLink to='/auth/login'>Return to Login?</SecondaryLink>
+                    </div>
+
+                    <Captcha
+                        className='mt-6'
+                        onError={(error) => {
+                            console.error('Captcha error:', error);
+                            addFlash({
+                                type: 'error',
+                                title: 'Error',
+                                message: 'Captcha verification failed. Please try again.',
+                            });
+                        }}
+                    />
+                </LoginFormContainer>
+            )}
+        </Formik>
     );
 };
 

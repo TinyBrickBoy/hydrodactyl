@@ -1,15 +1,11 @@
 import { TrashBin } from '@gravity-ui/icons';
 import { useState } from 'react';
-
-import ActionButton from '@/components/elements/ActionButton';
-import { Dialog } from '@/components/elements/dialog';
-
 import deleteServerAllocation from '@/api/server/network/deleteServerAllocation';
 import getServerAllocations from '@/api/swr/getServerAllocations';
-
-import { ServerContext } from '@/state/server';
-
+import { Dialog } from '@/components/elements/dialog';
+import { Button } from '@/components/ui/button';
 import { useFlashKey } from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 interface Props {
     allocation: number;
@@ -30,7 +26,10 @@ const DeleteAllocationButton = ({ allocation }: Props) => {
         setConfirm(false);
 
         mutate((data) => data?.filter((a) => a.id !== allocation), false);
-        setServerFromState((s) => ({ ...s, allocations: s.allocations.filter((a) => a.id !== allocation) }));
+        setServerFromState((s) => ({
+            ...s,
+            allocations: s.allocations.filter((a) => a.id !== allocation),
+        }));
 
         deleteServerAllocation(uuid, allocation).catch((error) => {
             clearAndAddHttpError(error);
@@ -49,15 +48,10 @@ const DeleteAllocationButton = ({ allocation }: Props) => {
             >
                 This allocation will be immediately removed from your server.
             </Dialog.Confirm>
-            <ActionButton
-                variant='danger'
-                size='sm'
-                onClick={() => setConfirm(true)}
-                className='flex items-center gap-2'
-            >
+            <Button variant='attention' size='sm' onClick={() => setConfirm(true)} className='flex items-center gap-2'>
                 <TrashBin width={22} height={22} fill='currentColor' />
                 <span className='hidden sm:inline'>Delete</span>
-            </ActionButton>
+            </Button>
         </>
     );
 };

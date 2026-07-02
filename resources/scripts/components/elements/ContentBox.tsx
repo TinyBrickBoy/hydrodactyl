@@ -1,5 +1,5 @@
-import FlashMessageRender from '@/components/FlashMessageRender';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import FlashMessageRender from '@/components/FlashMessageRender';
 
 type Props = Readonly<
     React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
@@ -11,7 +11,7 @@ type Props = Readonly<
 >;
 
 const ContentBox = ({ title, showFlashes, showLoadingOverlay, children, ...props }: Props) => (
-    <div className='p-8 bg-[#ffffff09] border-[1px] border-[#ffffff11] shadow-xs rounded-xl' {...props}>
+    <div className='p-8 bg-mocha-500 border-[1px] border-mocha-400 shadow-xs rounded-xl' {...props}>
         {title && <h2 className={`font-extrabold mb-4  text-2xl`}>{title}</h2>}
         {showFlashes && <FlashMessageRender byKey={typeof showFlashes === 'string' ? showFlashes : undefined} />}
         <div>

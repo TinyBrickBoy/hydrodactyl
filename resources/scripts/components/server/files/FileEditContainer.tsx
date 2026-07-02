@@ -1,15 +1,13 @@
-import { encodePathSegments } from '@/helpers';
 import type { LanguageDescription } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 import { For } from 'million/react';
 import { dirname } from 'pathe';
-import { lazy } from 'react';
-import { useEffect, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import { httpErrorToHuman } from '@/api/http';
+import getFileContents from '@/api/server/files/getFileContents';
+import saveFileContents from '@/api/server/files/saveFileContents';
 import Can from '@/components/elements/Can';
 import {
     DropdownMenu,
@@ -19,22 +17,22 @@ import {
 } from '@/components/elements/DropdownMenu';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import PageContentBlock from '@/components/elements/PageContentBlock';
+import FlashMessageRender from '@/components/FlashMessageRender';
 import FileManagerBreadcrumbs from '@/components/server/files/FileManagerBreadcrumbs';
 import FileNameModal from '@/components/server/files/FileNameModal';
-
-import { httpErrorToHuman } from '@/api/http';
-import getFileContents from '@/api/server/files/getFileContents';
-import saveFileContents from '@/api/server/files/saveFileContents';
-
-import { ServerContext } from '@/state/server';
-
+import { Button } from '@/components/ui/button';
+import { encodePathSegments } from '@/helpers';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 const Editor = lazy(() => import('@/components/elements/editor/Editor'));
 
 const FileEditContainer = () => {
     const [error, setError] = useState('');
-    const { action, '*': rawFilename } = useParams<{ action: 'edit' | 'new'; '*': string }>();
+    const { action, '*': rawFilename } = useParams<{
+        action: 'edit' | 'new';
+        '*': string;
+    }>();
     const [_, setLoading] = useState(action === 'edit');
     const [content, setContent] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
@@ -134,15 +132,16 @@ const FileEditContainer = () => {
                 </div>
             </ErrorBoundary>
 
-            {['.pteroignore', '.pteroignore'].includes(filename) ? (
+            {['.pyroignore', '.pyroignore'].includes(filename) ? (
                 <div className={`mb-4 p-4 border-l-4 bg-neutral-900 rounded-sm border-cyan-400`}>
                     <p className={`text-neutral-300 text-sm`}>
                         You&apos;re editing a{' '}
-                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>.pteroignore</code> file. Any files
+                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>.pyroignore</code> file. Any files
                         or directories listed in here will be excluded from backups. Wildcards are supported by using an
-                        asterisk (<code className={`font-mono bg-black rounded-sm py-px px-1`}>*</code>). You can negate
-                        a prior rule by prepending an exclamation point (
-                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>!</code>).
+                        asterisk (<code className={`font-mono bg-black rounded-sm py-px px-1`}>*</code>
+                        ). You can negate a prior rule by prepending an exclamation point (
+                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>!</code>
+                        ).
                     </p>
                 </div>
             ) : null}
@@ -234,8 +233,7 @@ const FileEditContainer = () => {
                 {action === 'edit' ? (
                     <Can action={'file.update'}>
                         <div className='flex gap-1 items-center justify-center'>
-                            <ActionButton
-                                variant='primary'
+                            <Button
                                 size='lg'
                                 className='rounded-l-full rounded-r-none pl-8 pr-6'
                                 onClick={() => save()}
@@ -244,14 +242,10 @@ const FileEditContainer = () => {
                                 <span className='ml-2 font-mono text-xs font-bold uppercase lg:inline-block hidden'>
                                     CTRL + S
                                 </span>
-                            </ActionButton>
+                            </Button>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <ActionButton
-                                        variant='primary'
-                                        size='lg'
-                                        className='rounded-r-full rounded-l-none px-2'
-                                    >
+                                    <Button size='lg' className='rounded-r-full rounded-l-none px-2'>
                                         <svg
                                             xmlns='http://www.w3.org/2000/svg'
                                             width='13'
@@ -266,7 +260,7 @@ const FileEditContainer = () => {
                                                 fill='white'
                                             />
                                         </svg>
-                                    </ActionButton>
+                                    </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
                                     className='max-h-[calc(100vh-4rem)] overflow-auto z-99999'
@@ -281,9 +275,9 @@ const FileEditContainer = () => {
                     </Can>
                 ) : (
                     <Can action={'file.create'}>
-                        <ActionButton variant='secondary' size='lg' onClick={() => setModalVisible(true)}>
+                        <Button variant='secondary' size='lg' onClick={() => setModalVisible(true)}>
                             Create File
-                        </ActionButton>
+                        </Button>
                     </Can>
                 )}
             </div>

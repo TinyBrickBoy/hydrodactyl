@@ -1,7 +1,7 @@
-import ActionButton from '@/components/elements/ActionButton';
-import CopyOnClick from '@/components/elements/CopyOnClick';
 import { Alert } from '@/components/elements/alert';
-import { Dialog, DialogProps } from '@/components/elements/dialog';
+import CopyOnClick from '@/components/elements/CopyOnClick';
+import { Dialog, type DialogProps } from '@/components/elements/dialog';
+import { Button } from '@/components/ui/button';
 
 interface RecoveryTokenDialogProps extends DialogProps {
     tokens: string[];
@@ -43,9 +43,7 @@ const RecoveryTokensDialog = ({ tokens, open, onClose }: RecoveryTokenDialogProp
                 These codes will not be shown again.
             </Alert>
             <Dialog.Footer>
-                <ActionButton variant='primary' onClick={onClose}>
-                    Done
-                </ActionButton>
+                <Button onClick={onClose}>Done</Button>
             </Dialog.Footer>
         </Dialog>
     );

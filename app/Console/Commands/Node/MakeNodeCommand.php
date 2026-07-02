@@ -26,8 +26,8 @@ class MakeNodeCommand extends Command
                             {--daemonSFTPPort= : Enter the wings SFTP listening port.}
                             {--daemonBase= : Enter the base folder.}
                             {--daemonType= : Enter the daemon Backend.}
-                             {--backupDisk= : Enter the Backup type}
-                             {--bucket= : Enter the S3 bucket ID}';
+                            {--backupDisk= : Enter the Backup type}
+                            {--bucket= : Enter the S3 bucket ID}';
 
     protected $description = 'Creates a new node on the system via the CLI.';
 
@@ -67,8 +67,8 @@ class MakeNodeCommand extends Command
         $data['daemonListen'] = $this->option('daemonListeningPort') ?? $this->ask('Enter the wings listening port', '8080');
         $data['daemonSFTP'] = $this->option('daemonSFTPPort') ?? $this->ask('Enter the wings SFTP listening port', '2022');
         $data['daemonBase'] = $this->option('daemonBase') ?? $this->ask('Enter the base folder', '/var/lib/pterodactyl/volumes');
-        $data['daemonType'] = $this->option('daemonType') ?? $this->ask('Enter the daemon backend', 'elytra');
-        $data['backupDisk'] = $this->option('backupDisk') ?? $this->ask('Enter the Backup Disk', 'rustic_local');
+        $data['daemonType'] = $this->option('daemonType') ?? $this->ask('Enter the daemon backend', 'wings');
+        $data['backupDisk'] = $this->option('backupDisk') ?? $this->ask('Enter the Backup Disk', 'wings');
         $data['bucket'] = $this->option('bucket') ?: null;
 
         $node = $this->creationService->handle($data);

@@ -1,4 +1,4 @@
-import { OPERATION_STATUS, OperationStatus } from '@/api/server/serverOperations';
+import { OPERATION_STATUS, type OperationStatus } from '@/api/server/serverOperations';
 
 /**
  * UI configuration constants for server operations.

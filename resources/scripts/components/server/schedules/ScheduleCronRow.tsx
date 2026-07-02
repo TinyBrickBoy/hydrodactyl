@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { Schedule } from '@/api/server/schedules/getServerSchedules';
+import type { Schedule } from '@/api/server/schedules/getServerSchedules';
 
 interface Props {
     cron: Schedule['cron'];

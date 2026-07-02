@@ -1,23 +1,18 @@
-import { Form, Formik, FormikHelpers } from 'formik';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { join } from 'pathe';
 import { useContext, useEffect, useState } from 'react';
 import { object, string } from 'yup';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
-import Code from '@/components/elements/Code';
-import Field from '@/components/elements/Field';
-import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
-
-import asDialog from '@/hoc/asDialog';
-
 import createDirectory from '@/api/server/files/createDirectory';
-
-// import { FileObject } from '@/api/server/files/loadDirectory';
-import { ServerContext } from '@/state/server';
-
+import Code from '@/components/elements/Code';
+import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
+import Field from '@/components/elements/Field';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import { Button } from '@/components/ui/button';
+import asDialog from '@/hoc/asDialog';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useFlashKey } from '@/plugins/useFlash';
+// import { FileObject } from '@/api/server/files/loadDirectory';
+import { ServerContext } from '@/state/server';
 
 interface Values {
     directoryName: string;
@@ -30,18 +25,18 @@ const schema = object().shape({
 // removed to prevent linting issues, you're welcome.
 //
 // const generateDirectoryData = (name: string): FileObject => ({
-//     key: `dir_${name.split('/', 1)[0] ?? name}`,
-//     name: name.replace(/^(\/*)/, '').split('/', 1)[0] ?? name,
-//     mode: 'drwxr-xr-x',
-//     modeBits: '0755',
-//     size: 0,
-//     isFile: false,
-//     isSymlink: false,
-//     mimetype: '',
-//     createdAt: new Date(),
-//     modifiedAt: new Date(),
-//     isArchiveType: () => false,
-//     isEditable: () => false,
+//   key: `dir_${name.split('/', 1)[0] ?? name}`,
+//   name: name.replace(/^(\/*)/, '').split('/', 1)[0] ?? name,
+//   mode: 'drwxr-xr-x',
+//   modeBits: '0755',
+//   size: 0,
+//   isFile: false,
+//   isSymlink: false,
+//   mimetype: '',
+//   createdAt: new Date(),
+//   modifiedAt: new Date(),
+//   isArchiveType: () => false,
+//   isEditable: () => false,
 // });
 
 const NewDirectoryDialog = asDialog({
@@ -89,12 +84,12 @@ const NewDirectoryDialog = asDialog({
                         </p>
                     </Form>
                     <Dialog.Footer>
-                        <ActionButton variant='secondary' className={'w-full sm:w-auto'} onClick={close}>
+                        <Button variant='secondary' className={'w-full sm:w-auto'} onClick={close}>
                             Cancel
-                        </ActionButton>
-                        <ActionButton variant='primary' className={'w-full sm:w-auto'} onClick={submitForm}>
+                        </Button>
+                        <Button variant='attention' className={'w-full sm:w-auto'} onClick={submitForm}>
                             Create
-                        </ActionButton>
+                        </Button>
                     </Dialog.Footer>
                 </>
             )}
@@ -108,9 +103,13 @@ const NewDirectoryButton = () => {
     return (
         <>
             <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} />
-            <ActionButton variant='secondary' onClick={setOpen.bind(this, true)}>
+            <Button
+                variant='secondary'
+                onClick={setOpen.bind(this, true)}
+                className='border-r-cream-600 rounded-r-none'
+            >
                 New Folder
-            </ActionButton>
+            </Button>
         </>
     );
 };

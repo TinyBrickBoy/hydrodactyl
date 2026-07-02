@@ -1,4 +1,4 @@
-import { SpinnerSize } from '@/components/elements/Spinner';
+import type { SpinnerSize } from '@/components/elements/Spinner';
 
 interface Props {
     visible: boolean;

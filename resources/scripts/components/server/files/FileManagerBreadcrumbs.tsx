@@ -1,6 +1,6 @@
-import { encodePathSegments } from '@/helpers';
 import { Fragment, useEffect, useState } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
+import { encodePathSegments } from '@/helpers';
 
 import { ServerContext } from '@/state/server';
 
@@ -41,7 +41,10 @@ const FileManagerBreadcrumbs = ({ renderLeft, withinFileEditor, isNewFile }: Pro
                     return { name: directory };
                 }
 
-                return { name: directory, path: `/${dirs.slice(0, index + 1).join('/')}` };
+                return {
+                    name: directory,
+                    path: `/${dirs.slice(0, index + 1).join('/')}`,
+                };
             });
     };
 

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
-import { Dialog, DialogProps, DialogWrapperContext, WrapperProps } from '@/components/elements/dialog';
+import { Dialog, type DialogProps, DialogWrapperContext, type WrapperProps } from '@/components/elements/dialog';
 
 function asDialog(
     initialProps?: WrapperProps,
 ): <P extends object>(C: React.ComponentType<P>) => React.FunctionComponent<P & DialogProps> {
-    return function (Component) {
-        const WrappedComponent = function ({ open, onClose, ...rest }) {
+    return (Component) => {
+        const WrappedComponent = ({ open, onClose, ...rest }) => {
             const [props, setProps] = useState<WrapperProps>(initialProps || {});
 
             return (

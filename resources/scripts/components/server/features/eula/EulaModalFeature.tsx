@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
-import Modal from '@/components/elements/Modal';
-import { SocketEvent, SocketRequest } from '@/components/server/events';
-
 import saveFileContents from '@/api/server/files/saveFileContents';
-
-import { ServerContext } from '@/state/server';
-
+import Modal from '@/components/elements/Modal';
+import FlashMessageRender from '@/components/FlashMessageRender';
+import { SocketEvent, SocketRequest } from '@/components/server/events';
+import { Button } from '@/components/ui/button';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 const EulaModalFeature = () => {
     const [visible, setVisible] = useState(false);
@@ -83,12 +79,12 @@ const EulaModalFeature = () => {
                     .
                 </p>
                 <div className={`my-6 gap-3 flex items-center justify-end`}>
-                    <ActionButton variant='secondary' onClick={() => setVisible(false)}>
+                    <Button variant='secondary' onClick={() => setVisible(false)}>
                         I don&apos;t accept
-                    </ActionButton>
-                    <ActionButton variant='primary' onClick={onAcceptEULA}>
+                    </Button>
+                    <Button variant='attention' onClick={onAcceptEULA}>
                         I accept
-                    </ActionButton>
+                    </Button>
                 </div>
             </div>
         </Modal>

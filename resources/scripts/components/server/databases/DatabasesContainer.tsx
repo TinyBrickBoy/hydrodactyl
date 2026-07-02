@@ -1,27 +1,24 @@
-import { Database } from '@gravity-ui/icons';
-import { Form, Formik, FormikHelpers } from 'formik';
+import { Database, Plus } from '@gravity-ui/icons';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { For } from 'million/react';
 import { useEffect, useState } from 'react';
 import { object, string } from 'yup';
-
-import FlashMessageRender from '@/components/FlashMessageRender';
-import ActionButton from '@/components/elements/ActionButton';
+import { httpErrorToHuman } from '@/api/http';
+import createServerDatabase from '@/api/server/databases/createServerDatabase';
+import getServerDatabases from '@/api/server/databases/getServerDatabases';
 import Can from '@/components/elements/Can';
 import Field from '@/components/elements/Field';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Modal from '@/components/elements/Modal';
-import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { PageListContainer, PageListItem } from '@/components/elements/pages/PageList';
+import ServerContentBlock from '@/components/elements/ServerContentBlock';
+import FlashMessageRender from '@/components/FlashMessageRender';
 import DatabaseRow from '@/components/server/databases/DatabaseRow';
-
-import { httpErrorToHuman } from '@/api/http';
-import createServerDatabase from '@/api/server/databases/createServerDatabase';
-import getServerDatabases from '@/api/server/databases/getServerDatabases';
-
-import { ServerContext } from '@/state/server';
-
+import ServerHeader from '@/components/server/header/ServerHeader';
+import { Button } from '@/components/ui/button';
 import { useDeepMemoize } from '@/plugins/useDeepMemoize';
 import useFlash from '@/plugins/useFlash';
+import { ServerContext } from '@/state/server';
 
 interface DatabaseValues {
     databaseName: string;
@@ -84,42 +81,35 @@ const DatabasesContainer = () => {
     }, []);
 
     return (
-        <ServerContentBlock title={'Databases'}>
-            <FlashMessageRender byKey={'databases'} />
-            <MainPageHeader
-                direction='column'
-                title={'Databases'}
-                titleChildren={
+        <ServerContentBlock className='p-0!' title={'Databases'} showFlashKey={'databases'}>
+            <ServerHeader />
+            <div className='px-2 pt-2 sm:px-14 sm:pt-14 flex flex-col sm:flex-row items-center gap-4'>
+                {(databaseLimit === null || (databaseLimit > 0 && databaseLimit !== databases.length)) && (
                     <Can action={'database.create'}>
-                        <div className='flex flex-col sm:flex-row items-center justify-end gap-4'>
-                            {databaseLimit === null && (
-                                <p className='text-sm text-zinc-300 text-center sm:text-right'>
-                                    {databases.length} databases (unlimited)
-                                </p>
-                            )}
-                            {databaseLimit > 0 && (
-                                <p className='text-sm text-zinc-300 text-center sm:text-right'>
-                                    {databases.length} of {databaseLimit} databases
-                                </p>
-                            )}
-                            {databaseLimit === 0 && (
-                                <p className='text-sm text-red-400 text-center sm:text-right'>Databases disabled</p>
-                            )}
-                            {(databaseLimit === null || (databaseLimit > 0 && databaseLimit !== databases.length)) && (
-                                <ActionButton variant='primary' onClick={() => setCreateModalVisible(true)}>
-                                    New Database
-                                </ActionButton>
-                            )}
-                        </div>
+                        <Button
+                            variant='secondary'
+                            onClick={() => setCreateModalVisible(true)}
+                            className='flex items-center gap-2'
+                        >
+                            <Plus width={22} height={22} className='w-4 h-4' fill='currentColor' />
+                            New Database
+                        </Button>
                     </Can>
-                }
-            >
-                <p className='text-sm text-neutral-400 leading-relaxed'>
-                    Create and manage MySQL databases for your server. Configure database access, manage users, and view
-                    connection details.
-                </p>
-            </MainPageHeader>
-
+                )}
+                {databaseLimit === null && (
+                    <p className='text-sm text-zinc-300 text-center sm:text-right'>
+                        {databases.length} databases (unlimited)
+                    </p>
+                )}
+                {databaseLimit > 0 && (
+                    <p className='text-sm text-zinc-300 text-center sm:text-right'>
+                        {databases.length} of {databaseLimit} databases
+                    </p>
+                )}
+                {databaseLimit === 0 && (
+                    <p className='text-sm text-red-400 text-center sm:text-right'>Databases disabled</p>
+                )}
+            </div>
             <Formik
                 onSubmit={submitDatabase}
                 initialValues={{ databaseName: '', connectionsFrom: '' }}
@@ -158,9 +148,9 @@ const DatabasesContainer = () => {
                                     />
                                 </div>
                                 <div className={`flex gap-3 justify-end my-6`}>
-                                    <ActionButton variant='primary' type={'submit'}>
+                                    <Button variant='attention' type={'submit'}>
                                         Create Database
-                                    </ActionButton>
+                                    </Button>
                                 </div>
                             </Form>
                         </div>

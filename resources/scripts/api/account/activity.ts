@@ -1,10 +1,10 @@
 import { toPaginatedSet } from '@definitions/helpers';
-import { ActivityLog, Transformers } from '@definitions/user';
+import { type ActivityLog, Transformers } from '@definitions/user';
 import type { AxiosError } from 'axios';
 import type { SWRConfiguration } from 'swr';
 import useSWR from 'swr';
 
-import http, { PaginatedResult, QueryBuilderParams, withQueryBuilderParams } from '@/api/http';
+import http, { type PaginatedResult, type QueryBuilderParams, withQueryBuilderParams } from '@/api/http';
 
 import useFilteredObject from '@/plugins/useFilteredObject';
 import { useUserSWRKey } from '@/plugins/useSWRKey';
