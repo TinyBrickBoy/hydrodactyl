@@ -113,10 +113,6 @@
         "dev:setup": "bash ./bin/devSetup.sh",
         "build": "vite build",
         "build:turbo": "turbo build",
-<<<<<<< HEAD
-=======
-        "build:docker:dev": "docker buildx build -t hydrodactyl:develop --build-arg DEV=true .",
->>>>>>> main
         "ship": "turbo lint build"
     },
     "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
