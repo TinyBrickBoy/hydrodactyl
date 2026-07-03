@@ -115,5 +115,5 @@
         "ship": "turbo build"
     },
     "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
-    "packageManager": "pnpm"
+    "packageManager": "pnpm@11.3.0"
 }
