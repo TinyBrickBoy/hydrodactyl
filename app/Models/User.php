@@ -138,12 +138,13 @@ class User extends Model implements
         'use_totp' => 'boolean',
         'gravatar' => 'boolean',
         'totp_authenticated_at' => 'datetime',
+        'sftp_password_expires_at' => 'datetime',
     ];
 
     /**
      * The attributes excluded from the model's JSON form.
      */
-    protected $hidden = ['password', 'remember_token', 'totp_secret', 'totp_authenticated_at'];
+    protected $hidden = ['password', 'remember_token', 'totp_secret', 'totp_authenticated_at', 'sftp_password', 'sftp_password_expires_at'];
 
     /**
      * Default values for specific fields in the database.
@@ -208,6 +209,23 @@ class User extends Model implements
             ->log('sending password reset email');
 
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Verify a plaintext password against the user's temporary SFTP password,
+     * if one is set and has not expired.
+     */
+    public function verifyTemporarySftpPassword(string $password): bool
+    {
+        if (empty($this->sftp_password) || $this->sftp_password_expires_at === null) {
+            return false;
+        }
+
+        if ($this->sftp_password_expires_at->isPast()) {
+            return false;
+        }
+
+        return password_verify($password, $this->sftp_password);
     }
 
     /**
