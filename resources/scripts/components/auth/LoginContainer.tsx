@@ -1,5 +1,7 @@
+import { useStoreState } from 'easy-peasy';
 import type { FormikHelpers } from 'formik';
 import { Formik } from 'formik';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { object, string } from 'yup';
 import login from '@/api/auth/login';
@@ -29,6 +31,16 @@ interface ErrorResponse {
 function LoginContainer() {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const navigate = useNavigate();
+    const sso = useStoreState((state) => state.settings.data?.sso);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const ssoError = params.get('sso_error');
+        if (ssoError) {
+            clearAndAddHttpError({ error: new Error(ssoError) });
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, []);
 
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         // clearFlashes();
@@ -135,6 +147,22 @@ function LoginContainer() {
                         </Button>
                         <SecondaryLink to='/auth/password'>Forgot your password?</SecondaryLink>
                     </div>
+
+                    {sso?.enabled && (
+                        <>
+                            <div className='flex items-center my-2'>
+                                <div className='flex-1 h-px bg-[#ffffff21]' />
+                                <span className='px-3 text-xs uppercase tracking-wide text-zinc-500'>or</span>
+                                <div className='flex-1 h-px bg-[#ffffff21]' />
+                            </div>
+                            <a
+                                href='/auth/login/sso'
+                                className='relative w-full rounded-lg border border-zinc-700 hover:border-zinc-500 text-center font-bold text-sm py-2 block no-underline text-zinc-100'
+                            >
+                                Sign in with {sso.displayName}
+                            </a>
+                        </>
+                    )}
                 </LoginFormContainer>
             )}
         </Formik>

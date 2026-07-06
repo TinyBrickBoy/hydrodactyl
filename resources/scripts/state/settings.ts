@@ -5,6 +5,11 @@ export interface SiteSettings {
     locale: string;
     timezone: string;
     logo?: string | null;
+    sso?: {
+        enabled: boolean;
+        displayName: string;
+        authenticated: boolean;
+    };
 }
 
 export interface SettingsStore {

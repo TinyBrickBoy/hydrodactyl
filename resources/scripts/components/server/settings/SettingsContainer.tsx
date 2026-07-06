@@ -7,6 +7,7 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
 import FlashMessageRender from '@/components/FlashMessageRender';
+import SftpPasswordForm from '@/components/dashboard/forms/SftpPasswordForm';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import ReinstallServerBox from '@/components/server/settings/ReinstallServerBox';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import RenameServerBox from './RenameServerBox';
 
 const SettingsContainer = () => {
     const username = useStoreState((state) => state.user.data!.username);
+    const ssoAuthenticated = useStoreState((state) => state.settings.data?.sso?.authenticated ?? false);
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const node = ServerContext.useStoreState((state) => state.server.data!.node);
@@ -78,7 +80,9 @@ const SettingsContainer = () => {
                             <div className={`flex-1`}>
                                 <div className={`border-l-4 border-brand p-3`}>
                                     <p className={`text-xs text-zinc-200`}>
-                                        Your SFTP password is the same as the password you use to access this panel.
+                                        {ssoAuthenticated
+                                            ? 'You signed in through SSO, so you have no panel password to use for SFTP. Generate a temporary SFTP password below.'
+                                            : 'Your SFTP password is the same as the password you use to access this panel, or you can generate a temporary SFTP password below.'}
                                     </p>
                                 </div>
                             </div>
@@ -87,6 +91,9 @@ const SettingsContainer = () => {
                                     <Button variant='secondary'>Launch SFTP</Button>
                                 </a>
                             </div>
+                        </div>
+                        <div className={`mt-6`}>
+                            <SftpPasswordForm showIntro={false} />
                         </div>
                     </TitledGreyBox>
                 </Can>
