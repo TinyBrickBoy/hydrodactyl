@@ -24,10 +24,12 @@ import HydrodactylProvider from './HydrodactylProvider';
 // const ServerRouter = lazy(() => import('@/routers/ServerRouter'));
 const UnifiedRouter = lazy(() => import('@/routers/UnifiedRouter'));
 const AuthenticationRouter = lazy(() => import('@/routers/AuthenticationRouter'));
+const SetupRouter = lazy(() => import('@/routers/SetupRouter'));
 
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
-    PyrodactylUser?: {
+    SetupRequired?: boolean;
+    HydrodactylUser?: {
         uuid: string;
         username: string;
         email: string;
@@ -41,17 +43,17 @@ interface ExtendedWindow extends Window {
 }
 
 const App = () => {
-    const { PyrodactylUser, SiteConfiguration } = window as ExtendedWindow;
-    if (PyrodactylUser && !store.getState().user.data) {
+    const { HydrodactylUser, SiteConfiguration } = window as ExtendedWindow;
+    if (HydrodactylUser && !store.getState().user.data) {
         store.getActions().user.setUserData({
-            uuid: PyrodactylUser.uuid,
-            username: PyrodactylUser.username,
-            email: PyrodactylUser.email,
-            language: PyrodactylUser.language,
-            rootAdmin: PyrodactylUser.root_admin,
-            useTotp: PyrodactylUser.use_totp,
-            createdAt: new Date(PyrodactylUser.created_at),
-            updatedAt: new Date(PyrodactylUser.updated_at),
+            uuid: HydrodactylUser.uuid,
+            username: HydrodactylUser.username,
+            email: HydrodactylUser.email,
+            language: HydrodactylUser.language,
+            rootAdmin: HydrodactylUser.root_admin,
+            useTotp: HydrodactylUser.use_totp,
+            createdAt: new Date(HydrodactylUser.created_at),
+            updatedAt: new Date(HydrodactylUser.updated_at),
         });
     }
 
@@ -79,6 +81,14 @@ const App = () => {
                         />
                         <BrowserRouter>
                             <Routes>
+                                <Route
+                                    path='/setup/*'
+                                    element={
+                                        <Spinner.Suspense>
+                                            <SetupRouter />
+                                        </Spinner.Suspense>
+                                    }
+                                />
                                 <Route
                                     path='/auth/*'
                                     element={
