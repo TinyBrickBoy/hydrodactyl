@@ -7,7 +7,7 @@ describe('@/lib/utils.ts', () => {
         });
 
         it('should handle conditional classes', () => {
-            expect(cn('base', false && 'hidden', 'visible')).toBe('base visible');
+            expect(cn('base', false, 'visible')).toBe('base visible');
         });
 
         it('should resolve tailwind conflicts', () => {

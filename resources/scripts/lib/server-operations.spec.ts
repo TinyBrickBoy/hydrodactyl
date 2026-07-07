@@ -1,4 +1,4 @@
-import { OPERATION_STATUS } from '@/api/server/serverOperations';
+import { OPERATION_STATUS, type OperationStatus } from '@/api/server/serverOperations';
 import {
     canCloseOperation,
     formatOperationId,
@@ -37,7 +37,7 @@ describe('@/lib/server-operations.ts', () => {
         });
 
         it('should default to pending for unknown status', () => {
-            const result = getStatusStyling('unknown' as any);
+            const result = getStatusStyling('unknown' as unknown as OperationStatus);
             expect(result.color).toBe('text-yellow-400');
         });
     });
@@ -64,7 +64,7 @@ describe('@/lib/server-operations.ts', () => {
         });
 
         it('should default to spinner for unknown status', () => {
-            expect(getStatusIconType('unknown' as any)).toBe('spinner');
+            expect(getStatusIconType('unknown' as unknown as OperationStatus)).toBe('spinner');
         });
     });
 

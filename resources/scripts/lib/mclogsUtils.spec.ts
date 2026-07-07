@@ -77,7 +77,9 @@ describe('@/lib/mclogsUtils.ts', () => {
     describe('debounce()', () => {
         it('should debounce function calls', async () => {
             let callCount = 0;
-            const fn = debounce(() => { callCount++; }, 50);
+            const fn = debounce(() => {
+                callCount++;
+            }, 50);
 
             fn();
             fn();
@@ -91,8 +93,10 @@ describe('@/lib/mclogsUtils.ts', () => {
         });
 
         it('should call with the latest arguments', async () => {
-            let lastArgs: any[] = [];
-            const fn = debounce((...args: any[]) => { lastArgs = args; }, 50);
+            let lastArgs: unknown[] = [];
+            const fn = debounce((...args: unknown[]) => {
+                lastArgs = args;
+            }, 50);
 
             fn('a');
             fn('b');
