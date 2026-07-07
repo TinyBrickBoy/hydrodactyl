@@ -28,8 +28,7 @@ export default () => {
             .join('&');
     };
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: getHashObject is defined inside, not needed
-    const hash = useMemo((): Record<string, string> => getHashObject(location.hash), [location.hash, getHashObject]);
+    const hash = useMemo((): Record<string, string> => getHashObject(location.hash), [location.hash]);
 
     return { hash, pathTo };
 };
